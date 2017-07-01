@@ -7,7 +7,7 @@ end
 function love.update(dt)
 	sayIt.Update()
 	if love.keyboard.isDown('q') then
-		sayIt.New("Mike Pence", {"Take it up the crapper...", "Get the zapper!", "Traps are qt.", "\n"})
+		sayIt.New("Mike Pence", {"Take it up the crapper...", "Get the zapper!", "Traps are qt."})
 	end
 end
 

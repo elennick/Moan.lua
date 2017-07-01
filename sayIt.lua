@@ -54,6 +54,9 @@ function sayIt.Draw()
 	    love.graphics.setColor( msgFontColor )
 	    love.graphics.print(messages.title, msgBoxPosX+padding, msgBoxPosY-boxHeight+(padding))
 		love.graphics.print(messages[currentMessage], msgBoxPosX+padding, msgBoxPosY-boxHeight+(padding*3))
+		if messages[currentMessage+1] ~= nil then
+			love.graphics.print("Next", msgBoxPosX+width-(6*padding), msgBoxPosY-(2*padding))
+		end
 	end
 end
 
