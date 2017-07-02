@@ -1,28 +1,29 @@
-require 'sayIt'
+require('sayIt')
 
 function love.load()
 	sayIt.Init()
 end
 
 function love.update(dt)
-	sayIt.Update()
+	sayIt.Update(dt)
 	if love.keyboard.isDown('q') then
 		sayIt.New("Mike Pence", {"Take it up the crapper...", "Get the zapper!", "Traps are qt."})
 	end
 end
 
-function love.draw( )
+function love.draw(dt)
+    love.graphics.setColor( 255, 255, 255 )
 	love.graphics.setBackgroundColor( 100, 100, 100 )
-	love.graphics.print(currentMessage, 10, 10)
+	love.graphics.print("Current queue: " .. currentMessage, 10, 10)
+	love.graphics.print("To print: " .. textToPrint, 10, 25)
+	love.graphics.print("Typing?: " .. tostring(typing), 10, 40)
 	sayIt.Draw()
 end
 
 function love.keyreleased(key)
 	sayIt.Handler(key)
 	if key == "w" then
-		sayIt.New("Mike Pence", {"Take it up the crapper...", "Get the zapper!", "Traps are qt.", "\n"})
-		sayIt.New("Scotch Egg", {"Say...", "You wouldn't have happen to come across any", "Female cohorts whom art being taught?", "\n" })
-		sayIt.New("Bill Nye", {"This next segment coming up is really good", "Lots of schmear", "Oy vey!"})
+		sayIt.New("Mike Pence", {"Take it up the crapper...", "Get the zapper!", "Traps are qt."})
 	end
 end
 

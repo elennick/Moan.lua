@@ -2,6 +2,14 @@
 
 A kind of buggy and bad simplistic messenger
 
+Include it via adding, `require 'sayIt'`, to the top of you `main.lua`
+
+- Syntax
+
+```lua
+sayIt.New("Title", {"Message one", "Message n"})
+```
+
 - Single message
 
 ```lua
@@ -17,3 +25,5 @@ sayIt.New("Bill Nye", {"This next segment coming up is really good", "Lots of sc
 ```
 
 An escape character, `\n`, must come after each `sayIt.New()` if multiple messages are being displayed - for reasons.
+
+Press `return` to cycle through messages.
