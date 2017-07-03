@@ -83,16 +83,16 @@ Which is kind of a crap way of implementing it, but you get the idea.
 
 ## Configuration
 
-`sayIt.Console` - (bool), displays some debugging info.
-`sayIt.Font` - The messagebox font
-`assetDir` - The folder in which sayIt.Init() finds the messagebox icons.
-`cameraSpeed` - How long in seconds it takes the camera to move from A to B.
-`boxHeight` - The height of the messagebox
-`padding` - The space between text, images, etc.
-`msgBoxPosX/Y` - The x/y coordinates of the messagebox
-`msgFontColor` - The messagebox font colour
-`msgBgColor` - The background colour of the messagebox
-`scale` - Used for scaling fonts to specific ratios - This is kind of a mess at the minute so I'll have to work on a more permanent way of setting unaliased fonts later
+- `sayIt.Console` - (bool), displays some debugging info.
+- `sayIt.Font` - The messagebox font
+- `assetDir` - The folder in which sayIt.Init() finds the messagebox icons.
+- `cameraSpeed` - How long in seconds it takes the camera to move from A to B.
+- `boxHeight` - The height of the messagebox
+- `padding` - The space between text, images, etc.
+- `msgBoxPosX/Y` - The x/y coordinates of the messagebox
+- `msgFontColor` - The messagebox font colour
+- `msgBgColor` - The background colour of the messagebox
+- `scale` - Used for scaling fonts to specific ratios - This is kind of a mess at the minute so I'll have to work on a more permanent way of setting unaliased fonts later
 
 Using the default config, the icons must be 420x420px - this is because of the ratio between `boxHeight` and padding.
 

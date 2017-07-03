@@ -26,7 +26,7 @@ end
 function love.keyreleased(key)
 	sayIt.Handler(key)
 	if key == "w" then
-		sayIt.New("noImg", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
+		sayIt.New("Mike Pence", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
 		sayIt.New("Bill Nye", {"I'm alright, running my new show on Netflix, things are looking up for me!", "It's got lots of...", "SCHMEAR :^)", "Hey, look up there!" }, p1.x, p1.y)
 		sayIt.New("Mike Pence", {"Wow a circle!" }, -200, -400)
 		sayIt.New("Mike Pence", {"That's pretty cool..."}, p2.x, p2.y)
