@@ -1,5 +1,13 @@
--- A really crappy hacky love2d dialogue thing
--- github.com/twentytwoo
+--[[
+	Möan.lua, v0.1 / July 03, 2017
+	A kind of hackish and limited dialogue box that works suprisingly well.
+	https://github.com/twentytwoo/Moan.lua
+
+	Depends upon;
+	flux: https://github.com/rxi/flux
+	HUMP.camera: https://github.com/vrld/hump
+]]
+
 Camera = require("Moan/libs/camera")
 flux = require("Moan/libs/flux")
 Moan = {
@@ -38,6 +46,7 @@ function Moan.Init()
 	cameraSpeed = 1
 	typeSpeed = 0.005
 	Moan.Console = true
+	advanceMsgKey = "return"
 	Moan.Font = love.graphics.newFont("Moan/monobit.ttf", 32)
 
 	-- Other stuff you don't care about
@@ -47,7 +56,7 @@ function Moan.Init()
 	titles = {}
 	coords = {}
 	currentMessage = 1
-	currentMsgCount = 1
+	currentFuncCnt = 1
 	showingMessage = false
 	textToPrint = messages[1] or ""
 	printedText  = "" -- Section of the text printed so far
@@ -65,7 +74,7 @@ function Moan.New(title, message, x, y)
 	coords[#coords+1] = {x, y}
 	messages.title = titles[1]
 	-- Set up initial the images + x, y
-	Moan.Next()
+	Moan.SetNextMsgConfig()
 	for k,v in ipairs(message) do
 		table.insert(messages, message[k])
 	end
@@ -82,11 +91,11 @@ function Moan.Update(dt)
 		if messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
 			-- Skip the "\n" msg, go to next title/msg and display it
 			currentMessage = currentMessage + 1
-			currentMsgCount = currentMsgCount + 1
+			currentFuncCnt = currentFuncCnt + 1
 			textToPrint = messages[currentMessage]
-			messages.title = titles[currentMsgCount]
+			messages.title = titles[currentFuncCnt]
 			titleImage = messages.title
-			Moan.Next()
+			Moan.SetNextMsgConfig()
 		else -- Hide the "\n" whitespace (hacky :P)
 			showingMessage = false
 		end
@@ -102,7 +111,7 @@ function Moan.Update(dt)
 
 	-- https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
 	if typePosition <= string.len(textToPrint) then
-		if showingMessage == true then
+		if showingMessage then
 			-- Decrease timer
 		    typeTimer = typeTimer - dt
 		end
@@ -151,12 +160,12 @@ function Moan.Draw(dt)
 		love.graphics.pop()
 	end
 
-	if Moan.Console == true then
+	if Moan.Console then
 	    love.graphics.push()
 	    	love.graphics.setFont(Moan.defaultFont)
 		    love.graphics.setColor( 255, 255, 255 )
 			love.graphics.printf("currentMessage: " .. currentMessage 	.. "\n" ..
-								"currentMsgCount: " .. currentMsgCount 		.. "\n" ..
+								"currentFuncCnt: " .. currentFuncCnt 		.. "\n" ..
 								"To print: " .. textToPrint 			.. "\n" ..
 								"No. messages: " .. #messages 			.. "\n" ..
 								"Typing?: " .. tostring(typing) 		.. "\n" -- END
@@ -166,36 +175,40 @@ function Moan.Draw(dt)
 end
 
 function Moan.Handler(key)
-	if key == "return" and showingMessage then
-		if typing == true then -- We can skip the typing
-			printedText = messages[currentMessage]
-			-- Tell it we've finished typing
-			typePosition = string.len(messages[currentMessage])
-		else -- We can show a new message!
-			-- Check the current message queue if we've finsihed
-			if messages[currentMessage + 2] == nil then -- Close everything
-				showingMessage = false
-				textToPrint = "" -- Do not crash - please!
-				typePosition = 0
-				currentMessage, currentMsgCount = 1, 1 -- Reset the counter position
-				-- Remove the shown messages / titles
-				Moan.ResetTable(messages)
-				Moan.ResetTable(titles)
-				Moan.ResetTable(coords)
-				currentMessage = 1
-			else -- Show the next message in the array
-				currentMessage = currentMessage + 1
-				textToPrint = messages[currentMessage]
-				typePosition = 0 -- Start typing from the start
-			end
+	if key == advanceMsgKey then
+		Moan.AdvanceMsg()
+	end
+end
+
+function Moan.AdvanceMsg()
+	if typing and showingMessage then -- We can skip the typing
+		printedText = messages[currentMessage]
+		-- Tell it we've finished typing
+		typePosition = string.len(messages[currentMessage])
+	else -- We can show a new message!
+		-- Check the current message queue if we've finsihed
+		if messages[currentMessage + 2] == nil then -- Close everything
+			showingMessage = false
+			textToPrint = "" -- Do not crash - please!
+			typePosition = 0
+			currentMessage, currentFuncCnt = 1, 1 -- Reset the counter position
+			-- Remove the shown messages / titles
+			Moan.ResetTable(messages)
+			Moan.ResetTable(titles)
+			Moan.ResetTable(coords)
+			currentMessage = 1
+		else -- Show the next message in the array
+			currentMessage = currentMessage + 1
+			textToPrint = messages[currentMessage]
+			typePosition = 0 -- Start typing from the start
 		end
 	end
 end
 
-function Moan.Next() -- DRY
-	if (coords[currentMsgCount][1] and coords[currentMsgCount][2]) ~= nil then
+function Moan.SetNextMsgConfig() -- DRY
+	if (coords[currentFuncCnt][1] and coords[currentFuncCnt][2]) ~= nil then
 		-- Tween the camera to the next position
-		flux.to(camera, cameraSpeed, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
+		flux.to(camera, cameraSpeed, { x = coords[currentFuncCnt][1], y = coords[currentFuncCnt][2] }):ease("cubicout")
 	end
 	-- Combine the asset directory w/ the title and replace spaces with _'s
 	titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
@@ -213,5 +226,10 @@ end
 function Moan.Debug()
 	for k,v in pairs(messages) do print(k,v) end
 	for k,v in pairs(titles) do print(k,v) end
-	for k,v in pairs(coords) do print(k,v) end
+	for k,v in pairs(coords) do
+		for i,j in pairs(coords[k]) do
+			io.write(coords[k][i])
+		end
+		print("") -- line break
+	end
 end

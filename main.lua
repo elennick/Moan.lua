@@ -4,11 +4,20 @@ function love.load()
 	Moan.Init()
 	p1 = { x = 100, y = 250 }
 	p2 = { x = 600, y = 250 }
-    camera = Camera(0,0)
+    camera = Camera(0, 0, 0.5)
 end
 
 function love.update(dt)
 	Moan.Update(dt)
+
+	if love.keyboard.isDown("q") then Moan.AdvanceMsg() end -- A bad way
+	-- Could used timer.every nth seconds Moan.AdvanceMsg() as an autoreader
+
+	if love.keyboard.isDown("up") then p1.y = p1.y - 1000 * dt end
+	if love.keyboard.isDown("down") then p1.y = p1.y + 1000 * dt end
+	if love.keyboard.isDown("left") then p1.x = p1.x - 1000 * dt end
+	if love.keyboard.isDown("right") then p1.x = p1.x + 1000 * dt end
+
 end
 
 function love.draw(dt)
@@ -19,7 +28,6 @@ function love.draw(dt)
 		love.graphics.rectangle("fill", p2.x, p2.y, 50, 50 )
 		love.graphics.circle("fill", -200, -400, 20)
     camera:detach()
-	for k,v in pairs(titles) do print(k,v) end
 	Moan.Draw()
 end
 
