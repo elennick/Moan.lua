@@ -1,49 +1,56 @@
 -- A really crappy hacky love2d dialogue thing
 -- github.com/twentytwoo
+Camera = require("sayIt/libs/camera")
+flux = require("sayIt/libs/flux")
 sayIt = {}
 function sayIt.Init()
-	sayIt.Font = love.graphics.newFont("monobit.ttf", 32)
+	sayIt.console = true
+	sayIt.Font = love.graphics.newFont("sayIt/monobit.ttf", 32)
+	sayIt.defaultFont = love.graphics.getFont()
 	love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
 	messages = {}
 	titles = {}
+	coords = {}
 	currentMessage = 1
-	currentTitle = 1
+	currentMsgCount = 1
 	showingMessage = false
-
 	textToPrint = messages[1] or ""
 	printedText  = "" -- Section of the text printed so far
-
 	-- Timer to know when to print a new letter
-	typeTimerMax = 0.01
-	typeTimer    = 0.01
+	typeTimerMax = 0.005
+	typeTimer    = 0.005
 	-- Current position in the text
 	typePosition = 0
+    camera = Camera(0, 0, 0.5)
 end
 
 function sayIt.New(title, message, x, y)
 	-- Let the first message have the first title
 	table.insert(titles, title)
+	-- Create a subtable for our coords inside coords table
+	coords[#coords+1] = {x, y}
 	messages.title = titles[1]
-	-- Set up the images, x, y
+	-- Set up initial the images + x, y
 	sayIt.Next()
-	-- Insert our messages into the table to be parsed
 	for k,v in ipairs(message) do
 		table.insert(messages, message[k])
-	end -- Let them be displayed
+	end
+	--[[ Hacly way of ending the functions message, tells us that this message is over,
+	     and we should change x/y + title according to the next sayIt.New() called ]]
+	table.insert(messages, "\n")
 	textToPrint = messages[1]
 	showingMessage = true
 end
 
 function sayIt.Update(dt)
-	collectgarbage() -- Somewhat helps things with below newImage
-
-	if messages[currentMessage] == "\n" then -- End of sayIt.New (multiple)
+	collectgarbage() -- Stops the new titleImage filling up the RAM
+	if messages[currentMessage] == "\n" then -- End of sayIt.New function
 		if messages[currentMessage + 1] ~= nil then -- Allow "\n" on single message
-			-- Skip the "\n" msg, go to next title and dispaly it
+			-- Skip the "\n" msg, go to next title/msg and display it
 			currentMessage = currentMessage + 1
-			currentTitle = currentTitle + 1
+			currentMsgCount = currentMsgCount + 1
 			textToPrint = messages[currentMessage]
-			messages.title = titles[currentTitle]
+			messages.title = titles[currentMsgCount]
 			titleImage = messages.title
 			sayIt.Next()
 		else -- Hide the "\n" whitespace (hacky :P)
@@ -51,12 +58,13 @@ function sayIt.Update(dt)
 		end
 	end
 
-    --camera:lookAt(p2.x, p2.y)
-
 	if messages[currentMessage] == printedText then -- We've finished typing the sentence
 		typing = false
 		else typing = true
 	end
+
+
+	flux.update(dt)
 
 	-- https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
 	if typePosition <= string.len(textToPrint) then
@@ -68,7 +76,7 @@ function sayIt.Update(dt)
 		    -- Timer done, we need to print a new letter:
 		    -- Adjust position, use string.sub to get sub-string
 		    if typeTimer <= 0 then
-		        typeTimer = 0.05
+		        typeTimer = 0.005
 		        typePosition = typePosition + 1
 		        printedText = string.sub(textToPrint, 0, typePosition)
 		    end
@@ -102,10 +110,22 @@ function sayIt.Draw(dt)
 	    	love.graphics.setFont(sayIt.Font)
 		    love.graphics.setColor( msgFontColor )
 		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight)
-			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(padding*2), msgBoxPosX+width-(4*padding), "left")
+			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(padding*2.2), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
 			if messages[currentMessage+1] ~= nil then
 				love.graphics.print(">", msgBoxPosX+width-(4*padding), msgBoxPosY-(3.5*padding))
 			end
+		love.graphics.pop()
+	end
+	if sayIt.console == true then
+	    love.graphics.push()
+	    	love.graphics.setFont(sayIt.defaultFont)
+		    love.graphics.setColor( 255, 255, 255 )
+			love.graphics.printf("currentMessage: " .. currentMessage 	.. "\n" ..
+								"currentMsgCount: " .. currentMsgCount 		.. "\n" ..
+								"To print: " .. textToPrint 			.. "\n" ..
+								"No. messages: " .. #messages 			.. "\n" ..
+								"Typing?: " .. tostring(typing) 		.. "\n" -- END
+								, 10, 10, love.graphics.getWidth( )/2)
 		love.graphics.pop()
 	end
 end
@@ -119,12 +139,14 @@ function sayIt.Handler(key)
 		else -- We can show a new message!
 			-- Check the current message queue if we've finsihed
 			if messages[currentMessage + 1] == nil then -- Close everything
-				textToPrint = "" -- Do not crash - please!
 				showingMessage = false
-				currentMessage, currentTitle = 1, 1 -- Reset the counter position
+				textToPrint = "" -- Do not crash - please!
+				typePosition = 0
+				currentMessage, currentMsgCount = 1, 1 -- Reset the counter position
 				-- Remove the shown messages / titles
-				for k,v in pairs(messages) do messages[k] = nil end
-				for k,v in pairs(titles) do titles[k] = nil end
+				sayIt.ResetTable(messages)
+				sayIt.ResetTable(titles)
+				sayIt.ResetTable(coords)
 				currentMessage = 1
 			else -- Show the next message in the array
 				currentMessage = currentMessage + 1
@@ -135,7 +157,20 @@ function sayIt.Handler(key)
 	end
 end
 
-function sayIt.Next()
+function sayIt.Next() -- DRY
+	if (coords[currentMsgCount][1] and coords[currentMsgCount][2]) ~= nil then
+		-- Tween the camera to the next position
+		flux.to(camera, 1, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
+	end
 	titleImage = love.graphics.newImage(string.gsub(messages.title, " ", "_") .. ".png")
 	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
+end
+
+function sayIt.ResetTable(table)
+	for k,v in ipairs(table) do table[k] = nil end
+end
+
+function sayIt.Debug()
+	for k,v in pairs(messages) do print(k,v) end
+	for k,v in pairs(titles) do print(k,v) end
 end
