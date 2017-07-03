@@ -2,10 +2,45 @@
 -- github.com/twentytwoo
 Camera = require("sayIt/libs/camera")
 flux = require("sayIt/libs/flux")
-sayIt = {}
+sayIt = {
+  _VERSION     = 'sayIt v0.1',
+  _URL         = 'https://github.com/twentytwoo/sayIt.lua',
+  _DESCRIPTION = 'A simple dialogue box for LOVE',
+  _LICENSE     = [[
+    MIT LICENSE
+
+    Copyright (c) 2017 May W.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ]]
+}
+
 function sayIt.Init()
-	sayIt.console = true
+	-- Main config options, graphical config in sayIt.Draw(dt)
+	assetsDir = "assets/"
+	cameraSpeed = 1
+	typeSpeed = 0.005
+	sayIt.Console = true
 	sayIt.Font = love.graphics.newFont("sayIt/monobit.ttf", 32)
+
+	-- Other stuff you don't care about
 	sayIt.defaultFont = love.graphics.getFont()
 	love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
 	messages = {}
@@ -17,11 +52,10 @@ function sayIt.Init()
 	textToPrint = messages[1] or ""
 	printedText  = "" -- Section of the text printed so far
 	-- Timer to know when to print a new letter
-	typeTimerMax = 0.005
-	typeTimer    = 0.005
+	typeTimerMax = typeSpeed
+	typeTimer    = typeSpeed
 	-- Current position in the text
 	typePosition = 0
-    camera = Camera(0, 0, 0.5)
 end
 
 function sayIt.New(title, message, x, y)
@@ -35,7 +69,7 @@ function sayIt.New(title, message, x, y)
 	for k,v in ipairs(message) do
 		table.insert(messages, message[k])
 	end
-	--[[ Hacly way of ending the functions message, tells us that this message is over,
+	--[[ Hackish way of ending the functions message, tells us that this message is over,
 	     and we should change x/y + title according to the next sayIt.New() called ]]
 	table.insert(messages, "\n")
 	textToPrint = messages[1]
@@ -45,7 +79,7 @@ end
 function sayIt.Update(dt)
 	collectgarbage() -- Stops the new titleImage filling up the RAM
 	if messages[currentMessage] == "\n" then -- End of sayIt.New function
-		if messages[currentMessage + 1] ~= nil then -- Allow "\n" on single message
+		if messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
 			-- Skip the "\n" msg, go to next title/msg and display it
 			currentMessage = currentMessage + 1
 			currentMsgCount = currentMsgCount + 1
@@ -63,7 +97,7 @@ function sayIt.Update(dt)
 		else typing = true
 	end
 
-
+	-- Update tweening lib
 	flux.update(dt)
 
 	-- https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
@@ -76,7 +110,7 @@ function sayIt.Update(dt)
 		    -- Timer done, we need to print a new letter:
 		    -- Adjust position, use string.sub to get sub-string
 		    if typeTimer <= 0 then
-		        typeTimer = 0.005
+		        typeTimer = typeSpeed
 		        typePosition = typePosition + 1
 		        printedText = string.sub(textToPrint, 0, typePosition)
 		    end
@@ -93,11 +127,11 @@ function sayIt.Draw(dt)
 	-- img dimensions = boxHeight - (2*padding)
 	local msgBoxPosX = 0+padding
 	local msgBoxPosY = height-padding
-	local msgBoxBg = { 0, 0, 0, 255 } -- RGBA
+	local msgBgColor = { 0, 0, 0, 255 } -- RGBA
 	local msgFontColor = { 255, 255, 255, 255}
 	if showingMessage then -- Draw the message
 		-- Replace spaces in title with _ for the image
-	    love.graphics.setColor( msgBoxBg )
+	    love.graphics.setColor( msgBgColor )
 	    love.graphics.rectangle("fill", msgBoxPosX, msgBoxPosY, width-(padding*2), -(boxHeight), 10, 0, 10 )
 
 	    love.graphics.push()
@@ -111,12 +145,13 @@ function sayIt.Draw(dt)
 		    love.graphics.setColor( msgFontColor )
 		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight)
 			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(padding*2.2), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
-			if messages[currentMessage+1] ~= nil then
+			if messages[currentMessage + 2] ~= nil then -- not "`\n"
 				love.graphics.print(">", msgBoxPosX+width-(4*padding), msgBoxPosY-(3.5*padding))
 			end
 		love.graphics.pop()
 	end
-	if sayIt.console == true then
+
+	if sayIt.Console == true then
 	    love.graphics.push()
 	    	love.graphics.setFont(sayIt.defaultFont)
 		    love.graphics.setColor( 255, 255, 255 )
@@ -138,7 +173,7 @@ function sayIt.Handler(key)
 			typePosition = string.len(messages[currentMessage])
 		else -- We can show a new message!
 			-- Check the current message queue if we've finsihed
-			if messages[currentMessage + 1] == nil then -- Close everything
+			if messages[currentMessage + 2] == nil then -- Close everything
 				showingMessage = false
 				textToPrint = "" -- Do not crash - please!
 				typePosition = 0
@@ -160,9 +195,10 @@ end
 function sayIt.Next() -- DRY
 	if (coords[currentMsgCount][1] and coords[currentMsgCount][2]) ~= nil then
 		-- Tween the camera to the next position
-		flux.to(camera, 1, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
+		flux.to(camera, cameraSpeed, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
 	end
-	titleImage = love.graphics.newImage(string.gsub(messages.title, " ", "_") .. ".png")
+	-- Combine the asset directory w/ the title and replace spaces with _'s
+	titleImage = love.graphics.newImage(string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
 	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
 end
 
@@ -173,4 +209,5 @@ end
 function sayIt.Debug()
 	for k,v in pairs(messages) do print(k,v) end
 	for k,v in pairs(titles) do print(k,v) end
+	for k,v in pairs(coords) do print(k,v) end
 end
