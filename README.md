@@ -18,7 +18,7 @@ Depends on [tween.lua]() and [HUMP camera](), both of which are included.
 
 Include it via adding, `require 'sayIt'`, to the top of your `main.lua`
 
-``lua
+```lua
 require('sayIt/sayIt')
 
 function love.load()
