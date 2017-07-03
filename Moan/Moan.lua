@@ -198,7 +198,11 @@ function Moan.Next() -- DRY
 		flux.to(camera, cameraSpeed, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
 	end
 	-- Combine the asset directory w/ the title and replace spaces with _'s
-	titleImage = love.graphics.newImage(string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
+	titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
+	if love.filesystem.exists(titleImage) == false then -- Display a placeholder instead
+		titleImage = "Moan/noImg.png"
+	end
+	titleImage = love.graphics.newImage(titleImage)
 	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
 end
 

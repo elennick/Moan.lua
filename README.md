@@ -12,11 +12,11 @@ A kind of hackish and limited dialogue box that works suprisingly well.
 
 ![Preview of Moan.lua](preview.gif)
 
-Depends on [tween.lua]() and [HUMP camera](), both of which are included.
+Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump), both of which are included.
 
 ## How to
 
-Include it via adding, `require 'Moan'`, to the top of your `main.lua`
+Include it via adding, `require('Moan/Moan')`, to the top of your `main.lua` and all the update/draw functions, i.e.
 
 ```lua
 require('Moan/Moan')
