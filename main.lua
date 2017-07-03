@@ -17,7 +17,6 @@ function love.update(dt)
 	if love.keyboard.isDown("down") then p1.y = p1.y + 1000 * dt end
 	if love.keyboard.isDown("left") then p1.x = p1.x - 1000 * dt end
 	if love.keyboard.isDown("right") then p1.x = p1.x + 1000 * dt end
-
 end
 
 function love.draw(dt)
@@ -28,6 +27,11 @@ function love.draw(dt)
 		love.graphics.rectangle("fill", p2.x, p2.y, 50, 50 )
 		love.graphics.circle("fill", -200, -400, 20)
     camera:detach()
+
+    if not showingMessage then
+	    camera:lockPosition(p1.x, p1.y)
+	end
+
 	Moan.Draw()
 end
 

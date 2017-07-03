@@ -50,12 +50,11 @@ end
 ## Syntax
 
 ```lua
+-- Create a new messageBox, title "Obey Me" with two messages, look at position x, y
 Moan.New("Obey Me", {"Message one", "Message n"}, x, y)
-             ^         [-------------------------] [---]
-             |                       ^               |
-           title                     |        goto x/y camera coords
-                              array of messages
 
+-- Go to the next message
+Moan.AdvanceMsg()
 ```
 
 The picture next to the text is found from the title, so in the instance above, the file "Obey_Me.png" will be used.
