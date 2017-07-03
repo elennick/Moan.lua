@@ -1,4 +1,4 @@
-# sayIt
+# Möan.lua
 
 A kind of hackish and limited dialogue box that works suprisingly well.
 
@@ -10,25 +10,25 @@ A kind of hackish and limited dialogue box that works suprisingly well.
 - Very easy to call
 - Messagebox titles (for peoples names)
 
-![Preview of sayIt.lua](preview.gif)
+![Preview of Moan.lua](preview.gif)
 
 Depends on [tween.lua]() and [HUMP camera](), both of which are included.
 
 ## How to
 
-Include it via adding, `require 'sayIt'`, to the top of your `main.lua`
+Include it via adding, `require 'Moan'`, to the top of your `main.lua`
 
 ```lua
-require('sayIt/sayIt')
+require('Moan/Moan')
 
 function love.load()
-	sayIt.Init()
+	Moan.Init()
     camera = Camera(0, 0, 0.5) -- Initialise the HUMP camera, looking at 0,0 scale 0.5
 	-- ...
 end
 
 function love.update(dt)
-	sayIt.Update(dt)
+	Moan.Update(dt)
 	-- ...
 end
 
@@ -39,18 +39,18 @@ function love.draw()
 
     -- We want the messagebox to be static in the window, and on top of everythin
     -- So this must be the in the draw function.
-	sayIt.Draw()
+	Moan.Draw()
 end
 
 function love.keyreleased(key)
-	sayIt.Handler(key)
+	Moan.Handler(key)
 end
 ```
 
 ## Syntax
 
 ```lua
-sayIt.New("Obey Me", {"Message one", "Message n"}, x, y)
+Moan.New("Obey Me", {"Message one", "Message n"}, x, y)
              ^         [-------------------------] [---]
              |                       ^               |
            title                     |        goto x/y camera coords
@@ -70,10 +70,10 @@ function love.load()
 end
 
 function love.keyreleased(key)
-	sayIt.Handler(key)
+	Moan.Handler(key)
 	if key == "w" then
 		for i,v in pairs(dialogue[1]) do
-			sayIt.New(dialogue[1][1], {dialogue[1][i]}, dialogue[1]["x"], dialogue[1]["y"])
+			Moan.New(dialogue[1][1], {dialogue[1][i]}, dialogue[1]["x"], dialogue[1]["y"])
 		end
 	end
 end
@@ -83,9 +83,9 @@ Which is kind of a crap way of implementing it, but you get the idea.
 
 ## Configuration
 
-- `sayIt.Console` - (bool), displays some debugging info.
-- `sayIt.Font` - The messagebox font
-- `assetDir` - The folder in which sayIt.Init() finds the messagebox icons.
+- `Moan.Console` - (bool), displays some debugging info.
+- `Moan.Font` - The messagebox font
+- `assetDir` - The folder in which Moan.Init() finds the messagebox icons.
 - `cameraSpeed` - How long in seconds it takes the camera to move from A to B.
 - `boxHeight` - The height of the messagebox
 - `padding` - The space between text, images, etc.

@@ -1,14 +1,14 @@
-require('sayIt/sayIt')
+require('Moan/Moan')
 
 function love.load()
-	sayIt.Init()
+	Moan.Init()
 	p1 = { x = 100, y = 250 }
 	p2 = { x = 600, y = 250 }
     camera = Camera(0,0)
 end
 
 function love.update(dt)
-	sayIt.Update(dt)
+	Moan.Update(dt)
 end
 
 function love.draw(dt)
@@ -20,19 +20,19 @@ function love.draw(dt)
 		love.graphics.circle("fill", -200, -400, 20)
     camera:detach()
 	for k,v in pairs(titles) do print(k,v) end
-	sayIt.Draw()
+	Moan.Draw()
 end
 
 function love.keyreleased(key)
-	sayIt.Handler(key)
+	Moan.Handler(key)
 	if key == "w" then
-		sayIt.New("Mike Pence", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
-		sayIt.New("Bill Nye", {"I'm alright, running my new show on Netflix, things are looking up for me!", "It's got lots of...", "SCHMEAR :^)", "Hey, look up there!" }, p1.x, p1.y)
-		sayIt.New("Mike Pence", {"Wow a circle!" }, -200, -400)
-		sayIt.New("Mike Pence", {"That's pretty cool..."}, p2.x, p2.y)
+		Moan.New("Mike Pence", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
+		Moan.New("Bill Nye", {"I'm alright, running my new show on Netflix, things are looking up for me!", "It's got lots of...", "SCHMEAR :^)", "Hey, look up there!" }, p1.x, p1.y)
+		Moan.New("Mike Pence", {"Wow a circle!" }, -200, -400)
+		Moan.New("Mike Pence", {"That's pretty cool..."}, p2.x, p2.y)
 	end
 end
 
 function love.quit()
-	sayIt.Debug()
+	Moan.Debug()
 end

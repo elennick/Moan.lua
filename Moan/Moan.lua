@@ -1,10 +1,10 @@
 -- A really crappy hacky love2d dialogue thing
 -- github.com/twentytwoo
-Camera = require("sayIt/libs/camera")
-flux = require("sayIt/libs/flux")
-sayIt = {
-  _VERSION     = 'sayIt v0.1',
-  _URL         = 'https://github.com/twentytwoo/sayIt.lua',
+Camera = require("Moan/libs/camera")
+flux = require("Moan/libs/flux")
+Moan = {
+  _VERSION     = 'Moan v0.1',
+  _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple dialogue box for LOVE',
   _LICENSE     = [[
     MIT LICENSE
@@ -32,16 +32,16 @@ sayIt = {
   ]]
 }
 
-function sayIt.Init()
-	-- Main config options, graphical config in sayIt.Draw(dt)
+function Moan.Init()
+	-- Main config options, graphical config in Moan.Draw(dt)
 	assetsDir = "assets/"
 	cameraSpeed = 1
 	typeSpeed = 0.005
-	sayIt.Console = true
-	sayIt.Font = love.graphics.newFont("sayIt/monobit.ttf", 32)
+	Moan.Console = true
+	Moan.Font = love.graphics.newFont("Moan/monobit.ttf", 32)
 
 	-- Other stuff you don't care about
-	sayIt.defaultFont = love.graphics.getFont()
+	Moan.defaultFont = love.graphics.getFont()
 	love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
 	messages = {}
 	titles = {}
@@ -58,27 +58,27 @@ function sayIt.Init()
 	typePosition = 0
 end
 
-function sayIt.New(title, message, x, y)
+function Moan.New(title, message, x, y)
 	-- Let the first message have the first title
 	table.insert(titles, title)
 	-- Create a subtable for our coords inside coords table
 	coords[#coords+1] = {x, y}
 	messages.title = titles[1]
 	-- Set up initial the images + x, y
-	sayIt.Next()
+	Moan.Next()
 	for k,v in ipairs(message) do
 		table.insert(messages, message[k])
 	end
 	--[[ Hackish way of ending the functions message, tells us that this message is over,
-	     and we should change x/y + title according to the next sayIt.New() called ]]
+	     and we should change x/y + title according to the next Moan.New() called ]]
 	table.insert(messages, "\n")
 	textToPrint = messages[1]
 	showingMessage = true
 end
 
-function sayIt.Update(dt)
+function Moan.Update(dt)
 	collectgarbage() -- Stops the new titleImage filling up the RAM
-	if messages[currentMessage] == "\n" then -- End of sayIt.New function
+	if messages[currentMessage] == "\n" then -- End of Moan.New function
 		if messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
 			-- Skip the "\n" msg, go to next title/msg and display it
 			currentMessage = currentMessage + 1
@@ -86,7 +86,7 @@ function sayIt.Update(dt)
 			textToPrint = messages[currentMessage]
 			messages.title = titles[currentMsgCount]
 			titleImage = messages.title
-			sayIt.Next()
+			Moan.Next()
 		else -- Hide the "\n" whitespace (hacky :P)
 			showingMessage = false
 		end
@@ -118,7 +118,7 @@ function sayIt.Update(dt)
 	end
 end
 
-function sayIt.Draw(dt)
+function Moan.Draw(dt)
 	local width = love.graphics.getWidth()
 	local height = love.graphics.getHeight()
 	local padding = 10
@@ -141,7 +141,7 @@ function sayIt.Draw(dt)
 	    love.graphics.pop()
 
 	    love.graphics.push()
-	    	love.graphics.setFont(sayIt.Font)
+	    	love.graphics.setFont(Moan.Font)
 		    love.graphics.setColor( msgFontColor )
 		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight)
 			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(padding*2.2), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
@@ -151,9 +151,9 @@ function sayIt.Draw(dt)
 		love.graphics.pop()
 	end
 
-	if sayIt.Console == true then
+	if Moan.Console == true then
 	    love.graphics.push()
-	    	love.graphics.setFont(sayIt.defaultFont)
+	    	love.graphics.setFont(Moan.defaultFont)
 		    love.graphics.setColor( 255, 255, 255 )
 			love.graphics.printf("currentMessage: " .. currentMessage 	.. "\n" ..
 								"currentMsgCount: " .. currentMsgCount 		.. "\n" ..
@@ -165,7 +165,7 @@ function sayIt.Draw(dt)
 	end
 end
 
-function sayIt.Handler(key)
+function Moan.Handler(key)
 	if key == "return" and showingMessage then
 		if typing == true then -- We can skip the typing
 			printedText = messages[currentMessage]
@@ -179,9 +179,9 @@ function sayIt.Handler(key)
 				typePosition = 0
 				currentMessage, currentMsgCount = 1, 1 -- Reset the counter position
 				-- Remove the shown messages / titles
-				sayIt.ResetTable(messages)
-				sayIt.ResetTable(titles)
-				sayIt.ResetTable(coords)
+				Moan.ResetTable(messages)
+				Moan.ResetTable(titles)
+				Moan.ResetTable(coords)
 				currentMessage = 1
 			else -- Show the next message in the array
 				currentMessage = currentMessage + 1
@@ -192,7 +192,7 @@ function sayIt.Handler(key)
 	end
 end
 
-function sayIt.Next() -- DRY
+function Moan.Next() -- DRY
 	if (coords[currentMsgCount][1] and coords[currentMsgCount][2]) ~= nil then
 		-- Tween the camera to the next position
 		flux.to(camera, cameraSpeed, { x = coords[currentMsgCount][1], y = coords[currentMsgCount][2] }):ease("cubicout")
@@ -202,11 +202,11 @@ function sayIt.Next() -- DRY
 	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
 end
 
-function sayIt.ResetTable(table)
+function Moan.ResetTable(table)
 	for k,v in ipairs(table) do table[k] = nil end
 end
 
-function sayIt.Debug()
+function Moan.Debug()
 	for k,v in pairs(messages) do print(k,v) end
 	for k,v in pairs(titles) do print(k,v) end
 	for k,v in pairs(coords) do print(k,v) end
