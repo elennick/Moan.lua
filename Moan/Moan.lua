@@ -1,5 +1,5 @@
 --[[
-	Möan.lua, v0.1 / July 03, 2017
+	Möan.lua, v0.1.3 / July 05, 2017
 	A kind of hackish and limited dialogue box that works suprisingly well.
 	https://github.com/twentytwoo/Moan.lua
 
