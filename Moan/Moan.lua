@@ -8,9 +8,9 @@
 	HUMP.camera: https://github.com/vrld/hump
 ]]
 
-Camera = require("Moan/libs/camera")
-flux = require("Moan/libs/flux")
-utf8 = require("utf8")
+Camera = require("Moan.libs.camera")
+local flux = require("Moan.libs.flux")
+local utf8 = require("utf8")
 Moan = {
   _VERSION     = 'Moan v0.1',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
@@ -48,10 +48,15 @@ function Moan.Init()
 	typeSpeed = 0.005
 	Moan.Console = true
 	advanceMsgKey = "return"
-	Moan.Font = love.graphics.newFont("Moan/monobit.ttf", 32)
+	Moan.Font = love.graphics.newFont("Moan/main.ttf", 24) -- multiple of 12px
+	--[[ -- Set fallbacks to your languages via
+	Moan.FontJpn = love.graphics.newFont("Moan/Japanese-font.ttf", 24)
+	Moan.Font:setFallbacks( Moan.FontJpn, ... )
+	]]
 
 	-- Other stuff you don't care about
 	Moan.defaultFont = love.graphics.getFont()
+	Moan.FontHeight = Moan.Font:getHeight()
 	love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
 	messages = {}
 	titles = {}
@@ -123,16 +128,16 @@ function Moan.Update(dt)
 		    if typeTimer <= 0 then
 		        typeTimer = typeSpeed
 		        typePosition = typePosition + 1
-				  local byteoffset = utf8.offset(textToPrint, typePosition)
+				  	local byteoffset = utf8.offset(textToPrint, typePosition)
                if byteoffset then
-			  printedText = string.sub(textToPrint, 0, byteoffset - 1)
+			   		printedText = string.sub(textToPrint, 0, byteoffset - 1)
 			   end
 		    end
 	    end
 	end
 end
 
-function Moan.Draw(dt)
+function Moan.Draw()
 	local width = love.graphics.getWidth()
 	local height = love.graphics.getHeight()
 	local padding = 10
@@ -157,10 +162,10 @@ function Moan.Draw(dt)
 	    love.graphics.push()
 	    	love.graphics.setFont(Moan.Font)
 		    love.graphics.setColor( msgFontColor )
-		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight)
-			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(padding*2.2), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
+		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(0.7*padding)) -- All the magic numbers
+			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY+(Moan.FontHeight)-boxHeight+(1.3*padding), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
 			if messages[currentMessage + 2] ~= nil then -- not "`\n"
-				love.graphics.print(">", msgBoxPosX+width-(4*padding), msgBoxPosY-(3.5*padding))
+				love.graphics.print("_", msgBoxPosX+width-(4.5*padding), msgBoxPosY-(3.5*padding))
 			end
 		love.graphics.pop()
 	end
@@ -211,7 +216,7 @@ function Moan.AdvanceMsg()
 end
 
 function Moan.SetNextMsgConfig() -- DRY
-	if (coords[currentFuncCnt][1] and coords[currentFuncCnt][2]) ~= nil then
+	if ( (coords[currentFuncCnt][1] and coords[currentFuncCnt][2]) ) ~= nil then
 		-- Tween the camera to the next position
 		flux.to(camera, cameraSpeed, { x = coords[currentFuncCnt][1], y = coords[currentFuncCnt][2] }):ease("cubicout")
 	end

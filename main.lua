@@ -37,7 +37,7 @@ function love.update(dt)
 	end
 end
 
-function love.draw(dt)
+function love.draw()
 	love.graphics.setBackgroundColor( 100, 100, 100 )
 
     camera:attach()
@@ -52,10 +52,11 @@ end
 function love.keyreleased(key)
 	Moan.Handler(key)
 	if key == "e" then -- Add some messages to the queue
-		Moan.New("Mike Pasdence", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
+		Moan.New("Test", {"How's things with you? Sorry I'm not very good at small talk - after all, this is just a demonstration, Maybe I should wrap again", "Heck I ran out of space back there, better move onto a new box, maybe a new line even!", "So yeah, how are you?" }, p2.x, p2.y)
 		Moan.New("Bill Nye", {"I'm alright, running my new show on Netflix, things are looking up for me!", "It's got lots of...", "SCHMEAR :^)", "Hey, look up there!" }, p1.x, p1.y)
 		Moan.New("Mike Pence", {"Wow a circle!" }, -200, -400)
 		Moan.New("Mike Pence", {"That's pretty cool..."}, p2.x, p2.y)
+		Moan.New("UTF8", {"I've added UTF8 support", "アイ・ドーント・ノー・ジャパニーズ・ホープフリー・ジス・トランズレーター・ダズント・メス・ジス・アップ・トゥー・マッチ", "Thanks @FuffySifilis"})
 	end
 end
 
