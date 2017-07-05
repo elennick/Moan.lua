@@ -10,6 +10,7 @@
 
 Camera = require("Moan/libs/camera")
 flux = require("Moan/libs/flux")
+utf8 = require("utf8")
 Moan = {
   _VERSION     = 'Moan v0.1',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
@@ -110,6 +111,7 @@ function Moan.Update(dt)
 	flux.update(dt)
 
 	-- https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
+	-- utf8 support - thanks @FuffySifilis
 	if typePosition <= string.len(textToPrint) then
 		if showingMessage then
 			-- Decrease timer
@@ -121,7 +123,10 @@ function Moan.Update(dt)
 		    if typeTimer <= 0 then
 		        typeTimer = typeSpeed
 		        typePosition = typePosition + 1
-		        printedText = string.sub(textToPrint, 0, typePosition)
+				  local byteoffset = utf8.offset(textToPrint, typePosition)
+               if byteoffset then
+			  printedText = string.sub(textToPrint, 0, byteoffset - 1)
+			   end
 		    end
 	    end
 	end
