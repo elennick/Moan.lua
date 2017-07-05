@@ -1,5 +1,5 @@
 --[[
-	Möan.lua, v0.1.3 / July 05, 2017
+	Möan.lua / July 05, 2017
 	A kind of hackish and limited dialogue box that works suprisingly well.
 	https://github.com/twentytwoo/Moan.lua
 
@@ -8,12 +8,8 @@
 	HUMP.camera: https://github.com/vrld/hump
 ]]
 
-local path = (...):match('^(.*[%./])[^%.%/]+$') or '' -- ech
-Camera = require(path .."/libs/camera")
-local flux = require(path .."/libs/flux")
-local utf8 = require("utf8")
 Moan = {
-  _VERSION     = 'Moan v0.1',
+  _VERSION     = 'Moan v0.1.3',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple dialogue box for LOVE',
   _LICENSE     = [[
@@ -42,6 +38,11 @@ Moan = {
   ]]
 }
 
+local path = (...):match('^(.*[%./])[^%.%/]+$') or '' -- ech
+Camera = require(path .."/libs/camera")
+local flux = require(path .."/libs/flux")
+local utf8 = require("utf8")
+
 function Moan.Init()
 	-- Main config options, graphical config in Moan.Draw(dt)
 	assetsDir = "assets/"
@@ -49,7 +50,7 @@ function Moan.Init()
 	typeSpeed = 0.005
 	Moan.Console = true
 	advanceMsgKey = "return"
-	Moan.Font = love.graphics.newFont("Moan/main.ttf", 24) -- multiple of 12px
+	Moan.Font = love.graphics.newFont(path .. "/main.ttf", 24) -- multiple of 12px
 	--[[ -- Set fallbacks to your languages via
 	Moan.FontJpn = love.graphics.newFont("Moan/Japanese-font.ttf", 24)
 	Moan.Font:setFallbacks( Moan.FontJpn, ... )
