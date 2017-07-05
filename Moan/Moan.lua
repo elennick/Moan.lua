@@ -8,8 +8,9 @@
 	HUMP.camera: https://github.com/vrld/hump
 ]]
 
-Camera = require("Moan.libs.camera")
-local flux = require("Moan.libs.flux")
+local path = (...):match('^(.*[%./])[^%.%/]+$') or '' -- ech
+Camera = require(path .."/libs/camera")
+local flux = require(path .."/libs/flux")
 local utf8 = require("utf8")
 Moan = {
   _VERSION     = 'Moan v0.1',
@@ -223,7 +224,7 @@ function Moan.SetNextMsgConfig() -- DRY
 	-- Combine the asset directory w/ the title and replace spaces with _'s
 	titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
 	if love.filesystem.exists(titleImage) == false then -- Display a placeholder instead
-		titleImage = "Moan/noImg.png"
+		titleImage = path .. "noImg.png"
 	end
 	titleImage = love.graphics.newImage(titleImage)
 	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
