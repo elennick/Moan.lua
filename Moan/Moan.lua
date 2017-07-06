@@ -9,7 +9,7 @@
 ]]
 
 Moan = {
-  _VERSION     = 'Moan v0.1.3',
+  _VERSION     = 'Moan v0.1.4',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple dialogue box for LOVE',
   _LICENSE     = [[
@@ -44,36 +44,37 @@ local flux = require(path .."/libs/flux")
 local utf8 = require("utf8")
 
 function Moan.Init()
-	-- Main config options, graphical config in Moan.Draw(dt)
-	assetsDir = "assets/"
-	cameraSpeed = 1
-	typeSpeed = 0.005
-	Moan.Console = true
-	advanceMsgKey = "return"
-	Moan.Font = love.graphics.newFont(path .. "/main.ttf", 24) -- multiple of 12px
-	--[[ -- Set fallbacks to your languages via
-	Moan.FontJpn = love.graphics.newFont("Moan/Japanese-font.ttf", 24)
-	Moan.Font:setFallbacks( Moan.FontJpn, ... )
-	]]
-
-	-- Other stuff you don't care about
-	Moan.defaultFont = love.graphics.getFont()
-	Moan.FontHeight = Moan.Font:getHeight()
-	love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
 	messages = {}
 	titles = {}
 	coords = {}
-	currentMessage = 1
-	currentFuncCnt = 1
-	showingMessage = false
-	textToPrint = messages[1] or ""
-	printedText  = "" -- Section of the text printed so far
-	-- Timer to know when to print a new letter
-	typeTimerMax = typeSpeed
-	typeTimer    = typeSpeed
-	-- Current position in the text
-	typePosition = 0
 end
+
+-- Main config options, graphical config in Moan.Draw(dt)
+local assetsDir = "assets/"
+local cameraSpeed = 1
+local typeSpeed = 0.005
+Moan.Console = false
+Moan.advanceMsgKey = "return"
+Moan.Font = love.graphics.newFont(path .. "/main.ttf", 24) -- multiple of 12px
+--[[ -- Set fallbacks to your languages via
+Moan.FontJpn = love.graphics.newFont("Moan/Japanese-font.ttf", 24)
+Moan.Font:setFallbacks( Moan.FontJpn, ... )
+]]
+
+-- Other stuff you don't care about
+Moan.defaultFont = love.graphics.getFont()
+Moan.FontHeight = Moan.Font:getHeight()
+love.graphics.setDefaultFilter("nearest", "nearest") -- No AA
+local currentMessage = 1
+local currentFuncCnt = 1
+Moan.showingMessage = false
+local textToPrint = ""
+local printedText  = "" -- Section of the text printed so far
+-- Timer to know when to print a new letter
+local typeTimerMax = typeSpeed
+local typeTimer    = typeSpeed
+-- Current position in the text
+local typePosition = 0
 
 function Moan.New(title, message, x, y)
 	-- Let the first message have the first title
@@ -90,11 +91,11 @@ function Moan.New(title, message, x, y)
 	     and we should change x/y + title according to the next Moan.New() called ]]
 	table.insert(messages, "\n")
 	textToPrint = messages[1]
-	showingMessage = true
+	Moan.showingMessage = true
 end
 
 function Moan.Update(dt)
-	collectgarbage() -- Stops the new titleImage filling up the RAM
+	collectgarbage() -- Stops the new Moan.titleImage filling up the RAM
 	if messages[currentMessage] == "\n" then -- End of Moan.New function
 		if messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
 			-- Skip the "\n" msg, go to next title/msg and display it
@@ -102,10 +103,10 @@ function Moan.Update(dt)
 			currentFuncCnt = currentFuncCnt + 1
 			textToPrint = messages[currentMessage]
 			messages.title = titles[currentFuncCnt]
-			titleImage = messages.title
+			Moan.titleImage = messages.title
 			Moan.SetNextMsgConfig()
 		else -- Hide the "\n" whitespace (hacky :P)
-			showingMessage = false
+			Moan.showingMessage = false
 		end
 	end
 
@@ -120,7 +121,7 @@ function Moan.Update(dt)
 	-- https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
 	-- utf8 support - thanks @FuffySifilis
 	if typePosition <= string.len(textToPrint) then
-		if showingMessage then
+		if Moan.showingMessage then
 			-- Decrease timer
 		    typeTimer = typeTimer - dt
 		end
@@ -150,7 +151,7 @@ function Moan.Draw()
 	local msgBoxPosY = height-padding
 	local msgBgColor = { 0, 0, 0, 255 } -- RGBA
 	local msgFontColor = { 255, 255, 255, 255}
-	if showingMessage then -- Draw the message
+	if Moan.showingMessage then -- Draw the message
 		-- Replace spaces in title with _ for the image
 	    love.graphics.setColor( msgBgColor )
 	    love.graphics.rectangle("fill", msgBoxPosX, msgBoxPosY, width-(padding*2), -(boxHeight), 10, 0, 10 )
@@ -158,14 +159,14 @@ function Moan.Draw()
 	    love.graphics.push()
 	    	love.graphics.scale(scale, scale)
 	    	love.graphics.setColor(255,255,255)
-			love.graphics.draw(titleImage, (msgBoxPosX+padding)*(1/scale), msgBoxPosY*(1/scale)-titleImgHeight-padding*(1/scale)) -- Look into a better way of this -> collectgarbage()
+			love.graphics.draw(Moan.titleImage, (msgBoxPosX+padding)*(1/scale), msgBoxPosY*(1/scale)-Moan.titleImgHeight-padding*(1/scale)) -- Look into a better way of this -> collectgarbage()
 	    love.graphics.pop()
 
 	    love.graphics.push()
 	    	love.graphics.setFont(Moan.Font)
 		    love.graphics.setColor( msgFontColor )
-		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(0.7*padding)) -- All the magic numbers
-			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(titleImgWidth/(1/scale)), msgBoxPosY+(Moan.FontHeight)-boxHeight+(1.3*padding), msgBoxPosX+width-(6*padding)-(titleImgWidth/(1/scale)), "left")
+		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(Moan.titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(0.7*padding)) -- All the magic numbers
+			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(Moan.titleImgWidth/(1/scale)), msgBoxPosY+(Moan.FontHeight)-boxHeight+(1.3*padding), msgBoxPosX+width-(6*padding)-(Moan.titleImgWidth/(1/scale)), "left")
 			if messages[currentMessage + 2] ~= nil then -- not "`\n"
 				love.graphics.print("_", msgBoxPosX+width-(4.5*padding), msgBoxPosY-(3.5*padding))
 			end
@@ -187,20 +188,20 @@ function Moan.Draw()
 end
 
 function Moan.Handler(key)
-	if key == advanceMsgKey then
+	if key == Moan.advanceMsgKey then
 		Moan.AdvanceMsg()
 	end
 end
 
 function Moan.AdvanceMsg()
-	if typing and showingMessage then -- We can skip the typing
+	if typing and Moan.showingMessage then -- We can skip the typing
 		printedText = messages[currentMessage]
 		-- Tell it we've finished typing
 		typePosition = string.len(messages[currentMessage])
 	else -- We can show a new message!
 		-- Check the current message queue if we've finsihed
 		if messages[currentMessage + 2] == nil then -- Close everything
-			showingMessage = false
+			Moan.showingMessage = false
 			textToPrint = "" -- Do not crash - please!
 			typePosition = 0
 			currentMessage, currentFuncCnt = 1, 1 -- Reset the counter position
@@ -223,12 +224,12 @@ function Moan.SetNextMsgConfig() -- DRY
 		flux.to(camera, cameraSpeed, { x = coords[currentFuncCnt][1], y = coords[currentFuncCnt][2] }):ease("cubicout")
 	end
 	-- Combine the asset directory w/ the title and replace spaces with _'s
-	titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
-	if love.filesystem.exists(titleImage) == false then -- Display a placeholder instead
-		titleImage = path .. "noImg.png"
+	Moan.titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
+	if love.filesystem.exists(Moan.titleImage) == false then -- Display a placeholder instead
+		Moan.titleImage = path .. "noImg.png"
 	end
-	titleImage = love.graphics.newImage(titleImage)
-	titleImgWidth, titleImgHeight = titleImage:getWidth(), titleImage:getHeight()
+	Moan.titleImage = love.graphics.newImage(Moan.titleImage)
+	Moan.titleImgWidth, Moan.titleImgHeight = Moan.titleImage:getWidth(), Moan.titleImage:getHeight()
 end
 
 function Moan.ResetTable(table)
