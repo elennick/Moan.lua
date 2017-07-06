@@ -43,17 +43,11 @@ Camera = require(path .."/libs/camera")
 local flux = require(path .."/libs/flux")
 local utf8 = require("utf8")
 
-function Moan.Init()
-	messages = {}
-	titles = {}
-	coords = {}
-end
-
 -- Main config options, graphical config in Moan.Draw(dt)
 local assetsDir = "assets/"
 local cameraSpeed = 1
 local typeSpeed = 0.005
-Moan.Console = false
+Moan.Console = true
 Moan.advanceMsgKey = "return"
 Moan.Font = love.graphics.newFont(path .. "/main.ttf", 24) -- multiple of 12px
 --[[ -- Set fallbacks to your languages via
@@ -76,41 +70,48 @@ local typeTimer    = typeSpeed
 -- Current position in the text
 local typePosition = 0
 
+function Moan.Init()
+	Moan.messages = {}
+	Moan.titles = {}
+	Moan.coords = {}
+end
+
+
 function Moan.New(title, message, x, y)
 	-- Let the first message have the first title
-	table.insert(titles, title)
-	-- Create a subtable for our coords inside coords table
-	coords[#coords+1] = {x, y}
-	messages.title = titles[1]
+	table.insert(Moan.titles, title)
+	-- Create a subtable for our Moan.coords inside Moan.coords table
+	Moan.coords[#Moan.coords+1] = {x, y}
+	Moan.messages.title = Moan.titles[1]
 	-- Set up initial the images + x, y
 	Moan.SetNextMsgConfig()
 	for k,v in ipairs(message) do
-		table.insert(messages, message[k])
+		table.insert(Moan.messages, message[k])
 	end
 	--[[ Hackish way of ending the functions message, tells us that this message is over,
 	     and we should change x/y + title according to the next Moan.New() called ]]
-	table.insert(messages, "\n")
-	textToPrint = messages[1]
+	table.insert(Moan.messages, "\n")
+	textToPrint = Moan.messages[1]
 	Moan.showingMessage = true
 end
 
 function Moan.Update(dt)
 	collectgarbage() -- Stops the new Moan.titleImage filling up the RAM
-	if messages[currentMessage] == "\n" then -- End of Moan.New function
-		if messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
+	if Moan.messages[currentMessage] == "\n" then -- End of Moan.New function
+		if Moan.messages[currentMessage + 2] ~= nil then -- Allow "\n" on single message
 			-- Skip the "\n" msg, go to next title/msg and display it
 			currentMessage = currentMessage + 1
 			currentFuncCnt = currentFuncCnt + 1
-			textToPrint = messages[currentMessage]
-			messages.title = titles[currentFuncCnt]
-			Moan.titleImage = messages.title
+			textToPrint = Moan.messages[currentMessage]
+			Moan.messages.title = Moan.titles[currentFuncCnt]
+			Moan.titleImage = Moan.messages.title
 			Moan.SetNextMsgConfig()
 		else -- Hide the "\n" whitespace (hacky :P)
 			Moan.showingMessage = false
 		end
 	end
 
-	if messages[currentMessage] == printedText then -- We've finished typing the sentence
+	if Moan.messages[currentMessage] == printedText then -- We've finished typing the sentence
 		typing = false
 		else typing = true
 	end
@@ -165,9 +166,9 @@ function Moan.Draw()
 	    love.graphics.push()
 	    	love.graphics.setFont(Moan.Font)
 		    love.graphics.setColor( msgFontColor )
-		    love.graphics.print(messages.title, msgBoxPosX+(2*padding)+(Moan.titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(0.7*padding)) -- All the magic numbers
+		    love.graphics.print(Moan.messages.title, msgBoxPosX+(2*padding)+(Moan.titleImgWidth/(1/scale)), msgBoxPosY-boxHeight+(0.7*padding)) -- All the magic numbers
 			love.graphics.printf(printedText, msgBoxPosX+(2*padding)+(Moan.titleImgWidth/(1/scale)), msgBoxPosY+(Moan.FontHeight)-boxHeight+(1.3*padding), msgBoxPosX+width-(6*padding)-(Moan.titleImgWidth/(1/scale)), "left")
-			if messages[currentMessage + 2] ~= nil then -- not "`\n"
+			if Moan.messages[currentMessage + 2] ~= nil then -- not "`\n"
 				love.graphics.print("_", msgBoxPosX+width-(4.5*padding), msgBoxPosY-(3.5*padding))
 			end
 		love.graphics.pop()
@@ -180,7 +181,7 @@ function Moan.Draw()
 			love.graphics.printf("currentMessage: " .. currentMessage 	.. "\n" ..
 								"currentFuncCnt: " .. currentFuncCnt 		.. "\n" ..
 								"To print: " .. textToPrint 			.. "\n" ..
-								"No. messages: " .. #messages 			.. "\n" ..
+								"No. Moan.messages: " .. #Moan.messages 			.. "\n" ..
 								"Typing?: " .. tostring(typing) 		.. "\n" -- END
 								, 10, 10, love.graphics.getWidth( )/2)
 		love.graphics.pop()
@@ -195,36 +196,36 @@ end
 
 function Moan.AdvanceMsg()
 	if typing and Moan.showingMessage then -- We can skip the typing
-		printedText = messages[currentMessage]
+		printedText = Moan.messages[currentMessage]
 		-- Tell it we've finished typing
-		typePosition = string.len(messages[currentMessage])
+		typePosition = string.len(Moan.messages[currentMessage])
 	else -- We can show a new message!
 		-- Check the current message queue if we've finsihed
-		if messages[currentMessage + 2] == nil then -- Close everything
+		if Moan.messages[currentMessage + 2] == nil then -- Close everything
 			Moan.showingMessage = false
 			textToPrint = "" -- Do not crash - please!
 			typePosition = 0
 			currentMessage, currentFuncCnt = 1, 1 -- Reset the counter position
-			-- Remove the shown messages / titles
-			Moan.ResetTable(messages)
-			Moan.ResetTable(titles)
-			Moan.ResetTable(coords)
+			-- Remove the shown Moan.messages / Moan.titles
+			Moan.ResetTable(Moan.messages)
+			Moan.ResetTable(Moan.titles)
+			Moan.ResetTable(Moan.coords)
 			currentMessage = 1
 		else -- Show the next message in the array
 			currentMessage = currentMessage + 1
-			textToPrint = messages[currentMessage]
+			textToPrint = Moan.messages[currentMessage]
 			typePosition = 0 -- Start typing from the start
 		end
 	end
 end
 
 function Moan.SetNextMsgConfig() -- DRY
-	if ( (coords[currentFuncCnt][1] and coords[currentFuncCnt][2]) ) ~= nil then
+	if ( (Moan.coords[currentFuncCnt][1] and Moan.coords[currentFuncCnt][2]) ) ~= nil then
 		-- Tween the camera to the next position
-		flux.to(camera, cameraSpeed, { x = coords[currentFuncCnt][1], y = coords[currentFuncCnt][2] }):ease("cubicout")
+		flux.to(camera, cameraSpeed, { x = Moan.coords[currentFuncCnt][1], y = Moan.coords[currentFuncCnt][2] }):ease("cubicout")
 	end
 	-- Combine the asset directory w/ the title and replace spaces with _'s
-	Moan.titleImage = (string.gsub(assetsDir .. messages.title, " ", "_") .. ".png")
+	Moan.titleImage = (string.gsub(assetsDir .. Moan.messages.title, " ", "_") .. ".png")
 	if love.filesystem.exists(Moan.titleImage) == false then -- Display a placeholder instead
 		Moan.titleImage = path .. "noImg.png"
 	end
@@ -237,11 +238,11 @@ function Moan.ResetTable(table)
 end
 
 function Moan.Debug()
-	for k,v in pairs(messages) do print(k,v) end
-	for k,v in pairs(titles) do print(k,v) end
-	for k,v in pairs(coords) do
-		for i,j in pairs(coords[k]) do
-			io.write(coords[k][i])
+	for k,v in pairs(Moan.messages) do print(k,v) end
+	for k,v in pairs(Moan.titles) do print(k,v) end
+	for k,v in pairs(Moan.coords) do
+		for i,j in pairs(Moan.coords[k]) do
+			io.write(Moan.coords[k][i])
 		end
 		print("") -- line break
 	end

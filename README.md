@@ -85,7 +85,7 @@ Which is kind of a crap way of implementing it, but you get the idea.
 
 - `Moan.Console` - (bool), displays some debugging info.
 - `Moan.Font` - The messagebox font
-- `advanceMsgKey` - The key that cycles through messages
+- `Moan.advanceMsgKey` - The key that cycles through messages
 - `assetDir` - The folder in which Moan.Init() finds the messagebox icons.
 - `cameraSpeed` - How long in seconds it takes the camera to move from A to B.
 - `boxHeight` - The height of the messagebox

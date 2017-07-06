@@ -26,7 +26,7 @@ function love.update(dt)
 	-- Moan only saves static coordinates, thus the camera cannot follow
 	-- a variables position, thus we must disable player movement when the
 	-- camera returns.
-    if showingMessage == false then
+    if Moan.showingMessage == false then
 	    camera:lockPosition(p1.x, p1.y, Camera.smooth.damped(2))
 	    p1.canMove = true
 	else
