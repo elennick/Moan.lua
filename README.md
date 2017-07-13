@@ -52,11 +52,11 @@ end
 
 ```lua
 -- Single message
-Moan.new("Title", {"Hello", "world!"}, {--Empty}, 10, 10, "Title.png")
+Moan.new("Title", {"Hello", "world!"}, {}, 10, 10, "Title.png")
 ```
 Which creates a messagebox with two messages, camera will look at `x=10`, `y=10`, and the image `Title.png` will be used.
 
-For a message with multiple choice, table left empty in the above example, `{}`, is used.
+For a message with multiple choice, the table left empty in the above example, `{}`, is used.
 ```lua
 Moan.new("Title", {"Array", "of", "messages"},
 		{{"Option one",   function() option1() end},
