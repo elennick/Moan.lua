@@ -58,7 +58,9 @@ love.graphics.setDefaultFilter( "nearest", "nearest")
 function Moan.new(title, messages, options, x, y, image)
 	-- Trick advanceMsg() into thinking there is an option; so it doesn't throw an error when calling a func that doesn't exist
 	if options[1] == nil then options = {{"",function()end},{"",function()end},{"",function()end}} end
-	if love.filesystem.exists(image) == false then image = PATH .. "noImg.png" end
+	if image == nil or love.filesystem.exists(image) == false then
+		image = PATH .. "noImg.png"
+	end
 	-- Insert the Moan.new into its own instance (table)
 	allMessages[#allMessages+1] = {title=title, messages=messages, options=options, x=x, y=y, image=image}
 	-- Set the last message as "\n", an indicator to change currentMsgInstance
@@ -70,13 +72,15 @@ function Moan.new(title, messages, options, x, y, image)
 	Moan.currentTitle = allMessages[Moan.currentMsgInstance].title
 	Moan.currentImage = love.graphics.newImage(allMessages[Moan.currentMsgInstance].image)
 	Moan.showingOptions = false
-	Moan.moveCamera()
+
 end
 
 function Moan.update(dt)
 	-- Update tweening library
 	flux.update(dt)
-	collectgarbage()
+	-- Be wary of updating the camera every dt...
+	Moan.moveCamera()
+	--collectgarbage()
 	-- Check if we're on the 2nd to last message in the instance, on the next advance we should be able to select an option
 	if Moan.showingMessage then
 		if allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
@@ -239,4 +243,8 @@ function Moan.moveCamera()
 	if (allMessages[Moan.currentMsgInstance].x and allMessages[Moan.currentMsgInstance].y) ~= nil then
 		flux.to(camera, 1, { x = allMessages[Moan.currentMsgInstance].x, y = allMessages[Moan.currentMsgInstance].y }):ease("cubicout")
 	end
+end
+
+function Moan.clearMessages()
+	for k,v in pairs(allMessages) do k = nil end
 end

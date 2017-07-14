@@ -5,7 +5,7 @@ love.graphics.setBackgroundColor(100, 100, 100, 255)
 p1 = { x=100, y=200}
 p2 = { x=400, y=150}
 p3 = { x=200, y=300}
-camera = Camera(0, 0, 1) -- Initialise the HUMP camera
+camera = Camera(0, 0) -- Initialise the HUMP camera
 
 	Moan.new("Möan.lua", {"Hello World!"}, {}, p1.x, p1.y, "Obey_Me.png")
 	Moan.new("A title", {"Message... One", "Hey check this out! \nI've got text wrapping and blah blah blah blah blah blah blah blah", "Aaaaaand multiple choice -  Nice."},
@@ -38,6 +38,15 @@ function love.keyreleased(key)
 end
 
 -- Test functions
-function red() love.graphics.setBackgroundColor(255, 0, 0, 255) end
-function green() love.graphics.setBackgroundColor(0, 255, 0, 255) end
-function blue() love.graphics.setBackgroundColor(0, 0, 255, 255) end
+function red()
+	love.graphics.setBackgroundColor(255, 0, 0, 255)
+	Moan.new("Hey", {"You selected red!"}, {}, 10, 10)
+end
+function green()
+	love.graphics.setBackgroundColor(0, 255, 0, 255)
+	Moan.new("Hey", {"You selected green!"}, {}, 10, 10)
+end
+function blue()
+	love.graphics.setBackgroundColor(0, 0, 255, 255)
+	Moan.new("Hey", {"You selected blue!"}, {}, 10, 10)
+end
