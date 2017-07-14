@@ -195,9 +195,9 @@ function Moan.draw()
 			love.graphics.print(allMessages[Moan.currentMsgInstance].options[2][1], textX+padding, msgTextY+2*(2.4*padding))
 			love.graphics.print(allMessages[Moan.currentMsgInstance].options[3][1], textX+padding, msgTextY+3*(2.4*padding))
 		end
-		if allMessages[Moan.currentMsgInstance+1] ~= nil and allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] ~= "\n" then
+		--if allMessages[Moan.currentMsgInstance+1] ~= nil and allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] ~= "\n" then
 			love.graphics.print(">", boxX+boxW-(2.5*padding), boxY+boxH-(3*padding))
-		end
+		--end
 	end
 end
 
