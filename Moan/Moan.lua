@@ -10,7 +10,7 @@ Moan = {
 	currentMessage  = "",
 	Font = love.graphics.newFont(PATH .. "main.ttf", 32),
 
-	_VERSION     = 'Möan v0.2.0',
+	_VERSION     = 'Möan v0.2.1',
 	_URL         = 'https://github.com/twentytwoo/Moan.lua',
 	_DESCRIPTION = 'A simple visual-novel messagebox for LÖVE',
 	_LICENSE     = [[
@@ -40,7 +40,7 @@ Moan = {
 }
 -- Require libs
 Camera = require(PATH .."/libs/camera")
-local flux = require(PATH .."/libs/flux")
+local flux = require(PATH .."libs/flux")
 local utf8 = require("utf8")
 
 -- Create the message instance container
@@ -55,14 +55,14 @@ local typePosition = 0
 
 love.graphics.setDefaultFilter( "nearest", "nearest")
 
-function Moan.new(title, messages, options, x, y, image)
-	-- Trick advanceMsg() into thinking there is an option; so it doesn't throw an error when calling a func that doesn't exist
-	if options[1] == nil then options = {{"",function()end},{"",function()end},{"",function()end}} end
+function Moan.new(title, messages, x, y, image, options)
+	-- Set default options to nothing such that no error is thrown in advanceMsg()
+	options = options or {{"",function()end},{"",function()end},{"",function()end}}
 	if image == nil or love.filesystem.exists(image) == false then
 		image = PATH .. "noImg.png"
 	end
 	-- Insert the Moan.new into its own instance (table)
-	allMessages[#allMessages+1] = {title=title, messages=messages, options=options, x=x, y=y, image=image}
+	allMessages[#allMessages+1] = {title=title, messages=messages, x=x, y=y, image=image, options=options}
 	-- Set the last message as "\n", an indicator to change currentMsgInstance
 	allMessages[#allMessages].messages[#messages+1] = "\n"
 	Moan.showingMessage = true

@@ -52,16 +52,16 @@ end
 
 ```lua
 -- Single message
-Moan.new("Title", {"Hello", "world!"}, {}, 10, 10, "Title.png")
+Moan.new("Title", {"Hello", "world!"}, 10, 10, "Title.png")
 ```
 Which creates a messagebox with two messages, camera will look at `x=10`, `y=10`, and the image `Title.png` will be used.
 
-For a message with multiple choice, the table left empty in the above example, `{}`, is used.
+For a message with multiple choice, the last arguement in the function is a table, with three more tables, each containing the option text, and the function that should be ran when the option is selected.
 ```lua
-Moan.new("Title", {"Array", "of", "messages"},
+Moan.new("Title", {"Array", "of", "messages"}, x, y, "img.png",
 		{{"Option one",   function() option1() end},
 		 {"Option two",   function() option2() end},
-		 {"Option three", function() option3() end}}, x, y, "img.png")
+		 {"Option three", function() option3() end}})
 ```
 
 On the final message in the array of messages, the three options will be displayed. Upon pressing return, the function relative to the open will be called.
