@@ -72,17 +72,15 @@ function Moan.new(title, messages, x, y, image, options)
 	Moan.currentTitle = allMessages[Moan.currentMsgInstance].title
 	Moan.currentImage = love.graphics.newImage(allMessages[Moan.currentMsgInstance].image)
 	Moan.showingOptions = false
-
 end
 
 function Moan.update(dt)
 	-- Update tweening library
 	flux.update(dt)
-	-- Be wary of updating the camera every dt...
-	Moan.moveCamera()
-	--collectgarbage()
 	-- Check if we're on the 2nd to last message in the instance, on the next advance we should be able to select an option
 	if Moan.showingMessage then
+		-- Be wary of updating the camera every dt...
+		Moan.moveCamera()
 		if allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
 			Moan.showingOptions = true
 		end
@@ -159,7 +157,6 @@ function Moan.advanceMsg()
 	Moan.currentTitle = allMessages[Moan.currentMsgInstance].title or ""
 	Moan.currentImage = love.graphics.newImage(allMessages[Moan.currentMsgInstance].image)
 	end
-
 end
 
 function Moan.draw()
