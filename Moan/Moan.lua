@@ -58,6 +58,15 @@ love.graphics.setDefaultFilter( "nearest", "nearest")
 function Moan.new(title, messages, x, y, image, options)
 	-- Set default options to nothing such that no error is thrown in advanceMsg()
 	options = options or {{"",function()end},{"",function()end},{"",function()end}}
+
+	--[[
+	for i,v in pairs(options) do
+		for k,j in pairs(options[i]) do
+			options[i][k] = function() options[i][k]() end
+			--print(options[i][k])
+		end
+	end
+	]]
 	if image == nil or love.filesystem.exists(image) == false then
 		image = PATH .. "noImg.png"
 	end
@@ -243,5 +252,7 @@ function Moan.moveCamera()
 end
 
 function Moan.clearMessages()
-	for k,v in pairs(allMessages) do k = nil end
+	-- Prevent crashes
+	Moan.showingMessage = false
+	allMessages = {}
 end

@@ -9,7 +9,7 @@ camera = Camera(0, 0) -- Initialise the HUMP camera
 
 dialogue = {
 	[1] = {"unpack()", {"You can use unpack() to keep all your dialogue somewhere else, keeping your code nice and clean."}, p1.x, p1.y, "Obey_Me.png"},
-	[2] = {"Advanced useage", {"You can also nest Moan.new's"}}
+	[2] = {"Advanced useage", {"Moan.advanceMsg() can be used to programmatically advance messages - good for dialogues and such"}}
 }
 Moan.new("Möan.lua", {"Hello World!"}, p1.x, p1.y, "Obey_Me.png")
 Moan.new("Title", {"Hey check me out!\nI've got text wrapping and blah blah blah blah blah blah blah blah blah blah", "Here's that multiple choice thing"}, p2.x, p2.y, "nil",
@@ -36,6 +36,9 @@ function love.keyreleased(key)
 	Moan.keyreleased(key)
 	if key == "f" and not typing then
 		Moan.advanceMsg()
+	end
+	if key == "c" then
+		Moan.clearMessages()
 	end
 end
 
