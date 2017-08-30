@@ -31,6 +31,7 @@ end
 
 
 function love.update(dt)
+	flux.update(dt)
 	Moan.update(dt)
 end
 
@@ -87,5 +88,5 @@ end
 function moreMessages()
 	Moan.new("Message queue", {"Each message is added to a \"message queue\", i.e. they're presented in the order that they're called. This is part of the design of Möan.lua"}, {x=p1.x, y=p1.y, onstart=function() rand() end})
 	Moan.new("UTF8 example", {"アイ・ドーント・ノー・ジャパニーズ・ホープフリー・ジス・トランズレーター・ダズント・メス・ジス・アップ・トゥー・マッチ"})
-	Moan.new("Goodbye", {"See ya around!"}, {x=p1.x, y=p1.y, oncomplete=function() rand() end})
+	Moan.new("Goodbye", {"See ya around!"}, {x=p3.x, y=p3.y, oncomplete=function() rand() end})
 end

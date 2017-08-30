@@ -54,8 +54,8 @@ end
 function Moan.new(title, messages, config)
 	-- Config checking / defaulting
 	config = config or {}
-	x = config.x or 0
-	y = config.y or 0
+	x = config.x
+	y = config.y
 	image = config.image or "nil"
 	options = config.options or {{"",function()end},{"",function()end},{"",function()end}}
 	onstart = config.onstart or function() end

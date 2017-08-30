@@ -7,28 +7,30 @@ May be unstable since I suck at version control.
 
 ## Features
 
-- Multiple choice options
+- Multiple choices prompt
 - Typing effect
 - Pausing
-- Smooth camera movement to specific locations
-- Message box icons
 - UTF-8 support, (multiple languages)
+- Typing sound on new characters
+- Optional HUMP camera integration
+- Message box icons
+
 
 ### To do:
 
-- Specific coloured text
+- Rich text, i.e. coloured/bold/italic text
 
 ## How to
 
 * Download the `Moan/` folder in this repo
-* Include it via adding, `require('Moan/Moan')`, to the top of your `main.lua`
+* Include it via adding, `require('Moan.Moan')`, to the top of your `main.lua`
 * Add the following to your main.lua
 
 ```lua
-require('Moan/Moan')
+require('Moan.Moan')
 
 function love.load()
-  Moan.new("Bob Smith", {"Hello World!"})
+  Moan.new("Title", {"Hello World!"})
 end
 
 function love.update(dt)
@@ -128,6 +130,7 @@ end
 
 function love.update(dt)
   flux.update(dt)
+  Moan.update(dt
 end
 
 function love.draw()
@@ -150,6 +153,7 @@ Moan.setSpeed(speed)
 - `"fast"`
 - `"medium"`
 - `"slow"`
+- Or some number, default is 0.01
 
 ### Moan.clearMessages()
 
@@ -162,6 +166,8 @@ Removes all messages from the queue and closes the messagebox.
 ## Configuration
 
 ### Controls
+* `Moan.typeSound` - Typing sound, should be a very short clip
+  - e.g. `Moan.typeSound = love.audio.newSource("typeSound.wav", "static")`
 * `Moan.selectButton` - Button that cycles messagess, skips typing and chooses an option (string), default: `"return"`
 * `Moan.indicatorCharacter` - Character before option to indicate selection (string), default: ">"
 * `Moan.typeSpeed` - Speed at which a character is inputted (int), default: `0.02`
@@ -169,8 +175,8 @@ Removes all messages from the queue and closes the messagebox.
 * `Moan.currentMessage` - Full current message (string)
 
 ### UI
-* `Moan.Font` - Messagebox font
-  -  Moan.font = `love.graphics.newFont("Moan/main.ttf", 32)` etc.
+* `Moan.font` - Messagebox font
+  - e.g. `Moan.font = love.graphics.newFont("Moan/main.ttf", 32)`
 * `padding` - Image, text padding
 * `boxH` - Height of messagebox
 * `boxW` - Width of messagebox
