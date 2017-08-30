@@ -1,4 +1,13 @@
-local PATH = (...):match('^(.*[%./])[^%.%/]+$') or '' -- ech
+--
+-- Möan.lua
+--
+-- Copyright (c) 2017 twentytwoo
+--
+-- This library is free software; you can redistribute it and/or modify it
+-- under the terms of the MIT license. See LICENSE for details.
+--
+
+local PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
 Moan = {
 	indicatorCharacter = ">",	-- Next message indicator
 	indicatorDelay = 15,		-- Delay between each flash of indicator
@@ -12,33 +21,9 @@ Moan = {
 	currentOption = 1,			-- Key of option function in Moan.new option array
 	currentImage = nil,			-- Avatar image
 
-	_VERSION     = 'Möan v0.2.5',
+	_VERSION     = '0.2.5',
 	_URL         = 'https://github.com/twentytwoo/Moan.lua',
 	_DESCRIPTION = 'A simple visual-novel messagebox for LÖVE',
-	_LICENSE     = [[
-	MIT LICENSE
-
-	Copyright (c) 2017 May W.
-
-	Permission is hereby granted, free of charge, to any person obtaining a
-	copy of this software and associated documentation files (the
-	"Software"), to deal in the Software without restriction, including
-	without limitation the rights to use, copy, modify, merge, publish,
-	distribute, sublicense, and/or sell copies of the Software, and to
-	permit persons to whom the Software is furnished to do so, subject to
-	the following conditions:
-
-	The above copyright notice and this permission notice shall be included
-	in all copies or substantial portions of the Software.
-
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-	CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-	TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-	]]
 }
 
 -- Require libs
@@ -67,39 +52,40 @@ if Moan.font == nil then
 end
 
 function Moan.new(title, messages, config)
-	-- Reorganise everything into config table for simplicity
+	-- Config checking / defaulting
+	config = config or {}
 	x = config.x or 0
 	y = config.y or 0
 	image = config.image or "nil"
 	options = config.options or {{"",function()end},{"",function()end},{"",function()end}}
 	onstart = config.onstart or function() end
 	oncomplete = config.oncomplete or function() end
-
 	if image == nil or love.filesystem.exists(image) == false then
-		image = PATH .. "noImg.png"
+		image = "Moan/noImg.png"
 	end
 
 	-- Insert the Moan.new into its own instance (table)
 	allMessages[#allMessages+1] = { title=title, messages=messages, x=x, y=y, image=image, options=options, onstart=onstart, oncomplete=oncomplete }
+
 	-- Set the last message as "\n", an indicator to change currentMsgInstance
 	allMessages[#allMessages].messages[#messages+1] = "\n"
 	Moan.showingMessage = true
-	typePosition = 0
-	-- Set the first message up, after this is set up via advanceMsg()
-	Moan.currentMessage = allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey]
-	Moan.currentTitle = allMessages[Moan.currentMsgInstance].title
-	Moan.currentImage = love.graphics.newImage(allMessages[Moan.currentMsgInstance].image)
-	Moan.showingOptions = false
-	-- Run the first startup function
-	allMessages[Moan.currentMsgInstance].onstart()
+
+	-- Only run .onstart()/setup if first message instance on first Moan.new
+	-- Prevents oncomplete=Moan.new(... recursion crashing the game.
+	if Moan.currentMsgInstance == 1 then
+		-- Set the first message up, after this is set up via advanceMsg()
+		typePosition = 0
+		Moan.currentMessage = allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey]
+		Moan.currentTitle = allMessages[Moan.currentMsgInstance].title
+		Moan.currentImage = love.graphics.newImage(allMessages[Moan.currentMsgInstance].image)
+		Moan.showingOptions = false
+		-- Run the first startup function
+		allMessages[Moan.currentMsgInstance].onstart()
+	end
 end
 
 function Moan.update(dt)
-	-- Update tweening library
-	if Moan.currentCamera ~= nil then
-		flux.update(dt)
-	end
-
 	-- Check if the output string is equal to final string, else we must be still typing it
 	if printedText == Moan.currentMessage then
 		typing = false else typing = true
@@ -113,6 +99,8 @@ function Moan.update(dt)
 				Moan.showIndicator = not Moan.showIndicator
 				indicatorTimer = 0
 			end
+		else
+			Moan.showIndicator = false
 		end
 
 		-- Check if we're on the 2nd to last message in the instance, on the next advance we should be able to select an option
@@ -150,6 +138,13 @@ function Moan.update(dt)
 		    -- Timer done, we need to print a new letter:
 		    -- Adjust position, use string.sub to get sub-string
 		    if typeTimer <= 0 then
+		    	-- Check if we have an audio file
+	        	if type(Moan.typeSound) == "userdata" then
+		    	-- Only make the keypress sound if the next character is a letter
+			        if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
+						Moan.typeSound:play()
+			        end
+				end
 		        typeTimer = typeTimerMax
 		        typePosition = typePosition + 1
 
@@ -227,7 +222,7 @@ function Moan.draw()
 		local msgTextY = textY+Moan.font:getHeight()
 		local msgLimit = boxW-(imgW/(1/scale))-(2*padding)
 		local fontColour = { 255, 255, 255, 255 }
-		local boxColour = { 0, 0, 0, 255 }
+		local boxColour = { 0, 0, 0, 222 }
 		love.graphics.setColor(boxColour)
 		love.graphics.rectangle("fill", boxX, boxY, boxW, boxH)
 		love.graphics.setColor(fontColour)
@@ -307,18 +302,15 @@ function Moan.setSpeed(speed)
 	if speed == "fast" then
 		Moan.typeSpeed = 0.01
 	elseif speed == "medium" then
-		Moan.typeSpeed = 0.03
+		Moan.typeSpeed = 0.04
 	elseif speed == "slow" then
-		Moan.typeSpeed = 0.06
+		Moan.typeSpeed = 0.08
+	else
+		assert(tonumber(speed), "Moan.setSpeed() - Expected number, got " .. tostring(speed))
+		Moan.typeSpeed = speed
 	end
-end
-
-function Moan.pause()
-	Moan.paused = true
-end
-
-function Moan.resume()
-	Moan.paused = false
+	-- Update the timeout timer.
+	typeTimerMax = Moan.typeSpeed
 end
 
 function Moan.setCamera(camToUse)
@@ -334,7 +326,6 @@ function Moan.moveCamera()
 		end
 	end
 end
-
 
 function Moan.clearMessages()
 	Moan.showingMessage = false	-- Prevents crashing
@@ -352,10 +343,84 @@ function Moan.debug()
 		"currentMsgInstance", Moan.currentMsgInstance,
 		"currentMsgKey", Moan.currentMsgKey,
 		"currentOption", Moan.currentOption,
-		"currentHeader", string.sub(Moan.currentMessage, string.len(printedText)+1, string.len(printedText)+2),
-		"typeSpeed", Moan.typeSpeed
+		"currentHeader", utf8.sub(Moan.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
+		"typeSpeed", Moan.typeSpeed,
+		"typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound)
 	}
-	for i=1, #log, 2 do -- modulos
+	for i=1, #log, 2 do
 		love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
 	end
 end
+
+-- External UTF8 functions
+-- https://github.com/alexander-yakushev/awesompd/blob/master/utf8.lua
+function utf8.charbytes (s, i)
+   -- argument defaults
+   i = i or 1
+   local c = string.byte(s, i)
+
+   -- determine bytes needed for character, based on RFC 3629
+   if c > 0 and c <= 127 then
+      -- UTF8-1
+      return 1
+   elseif c >= 194 and c <= 223 then
+      -- UTF8-2
+      local c2 = string.byte(s, i + 1)
+      return 2
+   elseif c >= 224 and c <= 239 then
+      -- UTF8-3
+      local c2 = s:byte(i + 1)
+      local c3 = s:byte(i + 2)
+      return 3
+   elseif c >= 240 and c <= 244 then
+      -- UTF8-4
+      local c2 = s:byte(i + 1)
+      local c3 = s:byte(i + 2)
+      local c4 = s:byte(i + 3)
+      return 4
+   end
+end
+
+function utf8.sub (s, i, j)
+   j = j or -1
+
+   if i == nil then
+      return ""
+   end
+
+   local pos = 1
+   local bytes = string.len(s)
+   local len = 0
+
+   -- only set l if i or j is negative
+   local l = (i >= 0 and j >= 0) or utf8.len(s)
+   local startChar = (i >= 0) and i or l + i + 1
+   local endChar = (j >= 0) and j or l + j + 1
+
+   -- can't have start before end!
+   if startChar > endChar then
+      return ""
+   end
+
+   -- byte offsets to pass to string.sub
+   local startByte, endByte = 1, bytes
+
+   while pos <= bytes do
+      len = len + 1
+
+      if len == startChar then
+	 startByte = pos
+      end
+
+      pos = pos + utf8.charbytes(s, pos)
+
+      if len == endChar then
+	 endByte = pos - 1
+	 break
+      end
+   end
+
+   return string.sub(s, startByte, endByte)
+end
+
+return Moan
