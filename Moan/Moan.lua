@@ -62,6 +62,10 @@ local colors = {
 	yellow = {255, 255, 0}
 }
 
+if Moan.font == nil then
+	Moan.font = defaultFont
+end
+
 function Moan.new(title, messages, config)
 	-- Reorganise everything into config table for simplicity
 	x = config.x or 0

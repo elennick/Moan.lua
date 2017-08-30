@@ -169,7 +169,8 @@ Removes all messages from the queue and closes the messagebox.
 * `Moan.currentMessage` - Full current message (string)
 
 ### UI
-* `Moan.Font` - Messagebox font, default: `love.graphics.newFont(PATH .. "main.ttf", 32)`
+* `Moan.Font` - Messagebox font
+  -  Moan.font = `love.graphics.newFont("Moan/main.ttf", 32)` etc.
 * `padding` - Image, text padding
 * `boxH` - Height of messagebox
 * `boxW` - Width of messagebox
