@@ -1,18 +1,23 @@
 require("Moan/Moan")
 
+Camera = require("libs/camera")
+flux = require("libs/flux")
+
+
 function love.load()
 	love.graphics.setBackgroundColor(100, 100, 100, 255)
 	p1 = { x=100, y=200 }
 	p2 = { x=400, y=150 }
 	p3 = { x=200, y=300 }
-	camera = Camera(0, 0) -- Initialise the HUMP camera
+	camera = Camera() -- Initialise the HUMP camera
+	Moan.setCamera(camera)
 
 	Moan.new("Möan.lua", {"Hello World!...--This is a very long uh,--testing string that...--I'm not actually going to use..."},
 			 { x=p1.x, y=p1.y, image="Obey_Me.png", oncomplete=function() red() Moan.setSpeed("slow") end})
 	Moan.new("Memean.lua", {"Please don't heck me up--please"},
-			 { x=p1.x, y=p1.y, image="Obey_Me.png", onstart=function() blue() end})
+			 { x=p2.x, y=p2.y, image="Obey_Me.png", onstart=function() blue() end})
 	Moan.new("Memean.lua", {"I'm red", "maybe--and then blue!"},
-			 { x=p1.x, y=p1.y, image="Obey_Me.png", onstart=function() red() end, oncomplete=function() blue() end})
+			 { x=p3.x, y=p3.y, image="Obey_Me.png", onstart=function() red() end, oncomplete=function() blue() end})
 
 end
 

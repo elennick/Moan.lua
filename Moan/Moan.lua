@@ -1,20 +1,20 @@
 local PATH = (...):match('^(.*[%./])[^%.%/]+$') or '' -- ech
 Moan = {
+	indicatorCharacter = ">",	-- Next message indicator
+	indicatorDelay = 15,		-- Delay between each flash of indicator
 	selectButton = "space",		-- Key that advances message
+	typeSpeed = 0.01,			-- Delay per character typed out
+	debug = true,				-- Display some debugging
+
+
+	Font = love.graphics.newFont(PATH .. "main.ttf", 32),
+	currentMessage  = "",
 	currentMsgInstance = 1, 	-- The Moan.new function instance
 	currentMsgKey= 1,			-- Key of value in the Moan.new messages
 	currentOption = 1,			-- Key of option function in Moan.new option array
 	currentImage = nil,			-- Avatar image
-	typeSpeed = 0.01,			-- Delay per character typed out
-	debug = true,				-- Display some debugging
 
-	indicatorCharacter = ">",	-- Next message indicator
-	indicatorDelay = 15,		-- Delay between each flash of indicator
-
-	Font = love.graphics.newFont(PATH .. "main.ttf", 32),
-	currentMessage  = "",
-
-	_VERSION     = 'Möan v0.2.4',
+	_VERSION     = 'Möan v0.2.5',
 	_URL         = 'https://github.com/twentytwoo/Moan.lua',
 	_DESCRIPTION = 'A simple visual-novel messagebox for LÖVE',
 	_LICENSE     = [[
@@ -43,9 +43,7 @@ Moan = {
 	]]
 }
 
--- Require libs
-Camera = require(PATH .."/libs/camera")
-local flux = require(PATH .."libs/flux")
+-- Require libs~
 local utf8 = require("utf8")
 
 -- Create the message instance container
@@ -96,7 +94,9 @@ end
 
 function Moan.update(dt)
 	-- Update tweening library
-	flux.update(dt)
+	if Moan.currentCamera ~= nil then
+		flux.update(dt)
+	end
 
 	-- Check if the output string is equal to final string, else we must be still typing it
 	if printedText == Moan.currentMessage then
@@ -114,7 +114,7 @@ function Moan.update(dt)
 		end
 
 		-- Check if we're on the 2nd to last message in the instance, on the next advance we should be able to select an option
-		-- Be wary of updating the camera every dt...
+		-- Be wary of updating the camera every dt..
 		Moan.moveCamera()
 		if allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
 			Moan.showingOptions = true
@@ -319,12 +319,20 @@ function Moan.resume()
 	Moan.paused = false
 end
 
+function Moan.setCamera(camToUse)
+	Moan.currentCamera = camToUse
+end
+
 function Moan.moveCamera()
-	-- Move the camera to the new instances position
-	if (allMessages[Moan.currentMsgInstance].x and allMessages[Moan.currentMsgInstance].y) ~= nil then
-		flux.to(camera, 1, { x = allMessages[Moan.currentMsgInstance].x, y = allMessages[Moan.currentMsgInstance].y }):ease("cubicout")
+	-- Only move the camera if one exists
+	if Moan.currentCamera ~= nil then
+		-- Move the camera to the new instances position
+		if (allMessages[Moan.currentMsgInstance].x and allMessages[Moan.currentMsgInstance].y) ~= nil then
+			flux.to(Moan.currentCamera, 1, { x = allMessages[Moan.currentMsgInstance].x, y = allMessages[Moan.currentMsgInstance].y }):ease("cubicout")
+		end
 	end
 end
+
 
 function Moan.clearMessages()
 	Moan.showingMessage = false	-- Prevents crashing

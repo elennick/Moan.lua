@@ -3,8 +3,6 @@
 A simple visual-novel messagebox for the LÖVE game framework.
 May be unstable since I suck at version control.
 
-Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump), both of which are included.
-
 ![Preview of Moan.lua](preview.gif)
 
 ## Features
@@ -30,8 +28,7 @@ Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://git
 require('Moan/Moan')
 
 function love.load()
-    -- Initialise the HUMP camera, looking at x=0, y=0, scale 0.5
-    camera = Camera(0, 0, 0.5)
+  Moan.new("Bob Smith", {"Hello World!"})
 end
 
 function love.update(dt)
@@ -40,9 +37,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    camera:attach()
-        -- Draw your stuff here
-    camera:detach()
+    -- Draw your stuff here
 
     -- We want the messagebox to be ontop of all other elements, so we draw it last
     Moan.draw()
@@ -64,8 +59,8 @@ Moan.new(title, messages, config)
 - **title**, string
 - **messages**, table, contains strings
 - **config**, table, contains message configs, takes;
-  * x, camera x position (int)
-  * y, camera y position (int)
+  * x, camera x position (int) -- Only passed if using camera
+  * y, camera y position (int) -- See Moan.setCamera()
   * image, message icon image (string)
   * onstart, function to be executed on message start
   * oncomplete, function executed on message end
@@ -74,6 +69,7 @@ Moan.new(title, messages, config)
     - [2], function to be exected if option is selected
 
 A full example:
+
 ```lua
 Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image="Image.png",
                   onstart=function() something() end, oncomplete=function() something() end,
@@ -86,13 +82,13 @@ Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image="Im
 
 ```lua
 -- Single message
-Moan.new("Title", {"Hello", "world!"}, {x=10, y=10, image="Title.png"})
+Moan.new("Title", {"Hello", "world!"}, {image="Title.png"})
 ```
-Which creates a messagebox with two messages, camera will look at `x=10`, `y=10`, and the image `Title.png` will be used.
+Which creates a messagebox with two messages and the image `Title.png` will be used.
 
 For a message with multiple choice, the last arguement in the function is a table, with three more tables, each containing the option text, and the function that should be ran when the option is selected.
 ```lua
-Moan.new("Title", {"Array", "of", "messages"}, {x=10, y=10, image="img.png",
+Moan.new("Title", {"Array", "of", "messages"}, {image="img.png",
          options={
            {"Option one",  function() option1() end},
            {"Option two",  function() option2() end},
@@ -108,19 +104,38 @@ There must be three options, no less and no more - else an error will be thrown.
 Moan.new("Title", {"Hello--World--This--Is--Lots--of pauses."})
 ```
 
-A double dash, `--`, causes Moan.lua to stop typing, and will only continue when `Moan.selectButton` is pressed.
+A double dash, `--`, causes Moan.lua to stop typing, and will only continue when `Moan.selectButton` is pressed, each `--` will be replaced with space.
 
-A good way to use Moan.lua is to utilise the `unpack()` function, you could enter messages into a table, and then unpack them, i.e.
+### Moan.setCamera()
+Sets the camera for Moan to use.
+
+Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump).
 
 ```lua
-dialogue = {
-    [1] = {"Title", {"This is a test instance of unpack()"}},
-    [2] = {"Title", {"Nice clean code."}, {x=100, y=10, image="image.png"}}
-    [3] = {"Title", {"Goodbye!"}}
-}
+Moan.setCamera(camToUse)
+```
 
-for i=1, #dialogue do
-    Moan.new(unpack(dialogue[i]))
+- camToUse - HUMP camera
+
+```lua
+Camera = require("libs/hump/camera")
+flux = require("libs/flux")
+
+function love.load()
+  camera = Camera(0,0)
+  Moan.setCamera(camera)
+end
+
+function love.update(dt)
+  flux.update(dt)
+end
+
+function love.draw()
+  camera:attach()
+    draw_world()
+  camera:detach()
+
+  Moan.draw()
 end
 ```
 
