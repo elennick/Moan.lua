@@ -6,8 +6,6 @@ Moan = {
 	typeSpeed = 0.01,			-- Delay per character typed out
 	debug = true,				-- Display some debugging
 
-
-	Font = love.graphics.newFont(PATH .. "main.ttf", 32),
 	currentMessage  = "",
 	currentMsgInstance = 1, 	-- The Moan.new function instance
 	currentMsgKey= 1,			-- Key of value in the Moan.new messages
@@ -43,7 +41,7 @@ Moan = {
 	]]
 }
 
--- Require libs~
+-- Require libs
 local utf8 = require("utf8")
 
 -- Create the message instance container
@@ -222,7 +220,7 @@ function Moan.draw()
 		local imgH = Moan.currentImage:getHeight()
 		local textX = (imgX+imgW)/(1/scale)+padding
 		local textY = boxY+padding
-		local msgTextY = textY+Moan.Font:getHeight()
+		local msgTextY = textY+Moan.font:getHeight()
 		local msgLimit = boxW-(imgW/(1/scale))-(2*padding)
 		local fontColour = { 255, 255, 255, 255 }
 		local boxColour = { 0, 0, 0, 255 }
@@ -233,7 +231,7 @@ function Moan.draw()
 			love.graphics.scale(scale, scale)
 			love.graphics.draw(Moan.currentImage, imgX, imgY)
 		love.graphics.pop()
-		love.graphics.setFont(Moan.Font)
+		love.graphics.setFont(Moan.font)
 		love.graphics.printf(Moan.currentTitle, textX, textY, boxW)
 		love.graphics.printf(printedText, textX, msgTextY, msgLimit)
 		if Moan.showingOptions and typing == false then

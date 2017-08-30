@@ -1,10 +1,11 @@
-require("Moan/Moan")
+require("Moan.Moan")
 
-Camera = require("libs/camera")
-flux = require("libs/flux")
+Camera = require("libs.camera")
+flux = require("libs.flux")
 
 
 function love.load()
+	Moan.font = love.graphics.newFont("Moan/main.ttf", 32),
 	love.graphics.setBackgroundColor(100, 100, 100, 255)
 	p1 = { x=100, y=200 }
 	p2 = { x=400, y=150 }
