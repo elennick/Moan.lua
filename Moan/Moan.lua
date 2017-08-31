@@ -23,7 +23,7 @@ Moan = {
 	currentOption = 1,			-- Key of option function in Moan.new option array
 	currentImage = nil,			-- Avatar image
 
-	_VERSION     = '0.2.6',
+	_VERSION     = '0.2.7',
 	_URL         = 'https://github.com/twentytwoo/Moan.lua',
 	_DESCRIPTION = 'A simple messagebox system for LÖVE',
 
@@ -403,7 +403,7 @@ function Moan.drawDebug()
 			"typeSpeed", Moan.typeSpeed,
 			"typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound),
 			"allMessages.len", #allMessages,
-			"titleColor", allMessages[Moan.currentMsgInstance].titleColor
+			--"titleColor", allMessages[Moan.currentMsgInstance].titleColor
 		}
 		for i=1, #log, 2 do
 			love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
