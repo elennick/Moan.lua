@@ -91,7 +91,8 @@ Moan.new("Title", {"Array", "of", "messages"}, {image="img.png",
 ```
 
 On the final message in the array of messages, the three options will be displayed. Upon pressing return, the function relative to the open will be called.
-There must be three options, no less and no more - else an error will be thrown. (I'll get around to this soon...)
+
+There can be "infinite" options, however the options will probably overflow depending on your UI configuration.
 
 ```lua
 Moan.new("Title", {"Hello--World--This--Is--Lots--of pauses."})
