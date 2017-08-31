@@ -1,12 +1,23 @@
-Moan = require("Moan.Moan")
+require("Moan/Moan")
 
 Camera = require("libs.camera")
 flux = require("libs.flux")
 
 function love.load()
-	-- Pass some customizations to Moan
-	Moan.font = love.graphics.newFont("Moan/main.ttf", 32)
-	Moan.typeSound = love.audio.newSource("typeSound.wav", "static")
+	-- The FontStruction “Pixel UniCode” (https://fontstruct.com/fontstructions/show/908795)
+	-- by “ivancr72” is licensed under a Creative Commons Attribution license
+	-- (http://creativecommons.org/licenses/by/3.0/).
+	Moan.font = love.graphics.newFont("assets/Pixel UniCode.ttf", 32)
+
+	-- Add font fallbacks for Japanese characters
+	JPfallback = love.graphics.newFont("assets/JPfallback.ttf", 32)
+	Moan.font:setFallbacks(JPfallback)
+
+	-- Audio from bfxr
+	Moan.typeSound = love.audio.newSource("assets/typeSound.wav", "static")
+	Moan.optionSound = love.audio.newSource("assets/optionSound.wav", "static")
+	Moan.typeSound:setVolume(0.5)
+	Moan.optionSound:setVolume(0.5)
 
 	love.graphics.setBackgroundColor(100, 100, 100, 255)
 	math.randomseed(os.time())
@@ -17,22 +28,29 @@ function love.load()
 	p3 = { x=200, y=300 }
 
 	-- Create a HUMP camera and pass it to Moan
-	camera = Camera(0,0)
+	camera = Camera(p1.x, p1.y)
 	Moan.setCamera(camera)
 
+	-- Set up our image for image argument in Moan.new config table
+	avatar = love.graphics.newImage("assets/Obey_Me.png")
+
 	-- Put some messages into the Moan queue
-	Moan.new("Möan.lua", {"Hello World!"})
-	Moan.new("Tutorial", {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things.", "Here's some options:"},
-			{x=p2.x, y=p2.y, image="Obey_Me.png", onstart=function() rand() end,
+	Moan.new("Möan.lua", {"Hello World!"}, {image=avatar})
+	Moan.new("Tutorial", {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
+			{x=p2.x, y=p2.y, image=avatar, onstart=function() rand() end})
+	Moan.new("Tutorial", {"Typing sound modulates with speed..."}, {onstart=function() Moan.setSpeed("slow") end, oncomplete=function() Moan.setSpeed("fast") end})
+	Moan.new("Tutorial", {"Here's some options:"}, {
 			options={{"Red", function() red() end},
 					 {"Blue", function() blue() end},
 					 {"Green", function() green() end}}})
 end
 
-
 function love.update(dt)
 	flux.update(dt)
 	Moan.update(dt)
+
+	-- Move the camera around
+	camera:rotate(0.01)
 end
 
 function love.draw()
@@ -59,7 +77,7 @@ function love.keyreleased(key)
 	elseif key == "o" then
 		Moan.resume()
 	elseif key == "s" then
-		Moan.new("Title", {"Message one", "two", "and three..."}, {onstart=function() red() end, oncomplete=function() green() end})
+		Moan.new("Title", {"Message one", "two", "and three..."}, {onstart=function() rand() end})
 	end
 end
 

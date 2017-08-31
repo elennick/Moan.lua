@@ -1,41 +1,41 @@
 # Möan.lua
+A simple messagebox system for LÖVE.
 
-A simple visual-novel messagebox for the LÖVE game framework.
-May be unstable since I suck at version control.
+```lua
+Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
+```
 
 ![Preview of Moan.lua](preview.gif)
 
 ## Features
-
 - Multiple choices prompt
-- Typing effect
-- Pausing
-- UTF-8 support, (multiple languages)
-- Typing sound on new characters
+- Typing effect + sounds
+- Pauses
+- UTF-8 support
 - Optional HUMP camera integration
 - Message box icons
 
+### Current bugs
+- UI is kind of dodgy with placement of text, you may have to tweak some values if you're using your own font
 
 ### To do:
-
 - Rich text, i.e. coloured/bold/italic text
 
 ## How to
-
 * Download the `Moan/` folder in this repo
-* Include it via adding, `require('Moan.Moan')`, to the top of your `main.lua`
+* Include it via adding, `require('Moan/Moan')`, to the top of your `main.lua`
 * Add the following to your main.lua
 
 ```lua
-require('Moan.Moan')
+require('Moan/Moan')
 
 function love.load()
+  -- Open a message
   Moan.new("Title", {"Hello World!"})
 end
 
 function love.update(dt)
     Moan.update(dt)
-    -- ...
 end
 
 function love.draw()
@@ -53,9 +53,7 @@ end
 ## Syntax
 
 ### Moan.new
-
 ```lua
--- Arguements
 Moan.new(title, messages, config)
 ```
 - **title**, string
@@ -63,7 +61,7 @@ Moan.new(title, messages, config)
 - **config**, table, contains message configs, takes;
   * x, camera x position (int) -- Only passed if using camera
   * y, camera y position (int) -- See Moan.setCamera()
-  * image, message icon image (string)
+  * image, message icon image e.g. `love.graphics.newImage("img.png")`
   * onstart, function to be executed on message start
   * oncomplete, function executed on message end
   * options, table, contains **3** options
@@ -71,9 +69,9 @@ Moan.new(title, messages, config)
     - [2], function to be exected if option is selected
 
 A full example:
-
 ```lua
-Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image="Image.png",
+avatar = love.graphics.newImage("image.png")
+Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image=avatar,
                   onstart=function() something() end, oncomplete=function() something() end,
                   options={
                    {"Option one",  function() option1() end},
@@ -81,12 +79,6 @@ Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image="Im
                    {"Option three",function() option3() end}}
                   })
 ```
-
-```lua
--- Single message
-Moan.new("Title", {"Hello", "world!"}, {image="Title.png"})
-```
-Which creates a messagebox with two messages and the image `Title.png` will be used.
 
 For a message with multiple choice, the last arguement in the function is a table, with three more tables, each containing the option text, and the function that should be ran when the option is selected.
 ```lua
@@ -99,25 +91,22 @@ Moan.new("Title", {"Array", "of", "messages"}, {image="img.png",
 ```
 
 On the final message in the array of messages, the three options will be displayed. Upon pressing return, the function relative to the open will be called.
-There must be three options, no less and no more - else an error will be thrown.
+There must be three options, no less and no more - else an error will be thrown. (I'll get around to this soon...)
 
-```
--- Pauses
+```lua
 Moan.new("Title", {"Hello--World--This--Is--Lots--of pauses."})
 ```
 
 A double dash, `--`, causes Moan.lua to stop typing, and will only continue when `Moan.selectButton` is pressed, each `--` will be replaced with space.
 
 ### Moan.setCamera()
-Sets the camera for Moan to use.
+Sets the HUMP camera for Moan to use.
 
 Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump).
 
 ```lua
 Moan.setCamera(camToUse)
 ```
-
-- camToUse - HUMP camera
 
 ```lua
 Camera = require("libs/hump/camera")
@@ -126,6 +115,9 @@ flux = require("libs/flux")
 function love.load()
   camera = Camera(0,0)
   Moan.setCamera(camera)
+
+  Moan.new("", {"Look here..."}, {x=10, y=50})
+  Moan.new("", {"And there there...". {x=70, y=0})
 end
 
 function love.update(dt)
@@ -168,6 +160,7 @@ Removes all messages from the queue and closes the messagebox.
 ### Controls
 * `Moan.typeSound` - Typing sound, should be a very short clip
   - e.g. `Moan.typeSound = love.audio.newSource("typeSound.wav", "static")`
+* `Moan.optionSound` - Sound to be played when a option is selected
 * `Moan.selectButton` - Button that cycles messagess, skips typing and chooses an option (string), default: `"return"`
 * `Moan.indicatorCharacter` - Character before option to indicate selection (string), default: ">"
 * `Moan.typeSpeed` - Speed at which a character is inputted (int), default: `0.02`
