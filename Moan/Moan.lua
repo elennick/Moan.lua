@@ -11,6 +11,7 @@ local utf8 = require("utf8")
 local PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
 Moan = {
 	indicatorCharacter = ">",	-- Next message indicator
+	optionCharacter = "- ",		-- Option select character
 	indicatorDelay = 25,		-- Delay between each flash of indicator
 	selectButton = "space",		-- Key that advances message
 	typeSpeed = 0.01,			-- Delay per character typed out
@@ -25,6 +26,8 @@ Moan = {
 	_VERSION     = '0.2.6',
 	_URL         = 'https://github.com/twentytwoo/Moan.lua',
 	_DESCRIPTION = 'A simple messagebox system for LÖVE',
+
+	UI = {}
 }
 
 -- Create the message instance container
@@ -40,11 +43,6 @@ local typePosition = 0
 -- Initialise timer for the indicator
 local indicatorTimer = 0
 local defaultFont = love.graphics.newFont()
-local colors = {
-	red    = {255, 0, 0},
-	blue   = {0, 0, 255},
-	yellow = {255, 255, 0}
-}
 
 if Moan.font == nil then
 	Moan.font = defaultFont
@@ -118,11 +116,11 @@ function Moan.update(dt)
 			-- Constantly update the option prefix
 			for i=1, #allMessages[Moan.currentMsgInstance].options do
 				-- Remove the indicators from other selections
-				allMessages[Moan.currentMsgInstance].options[i][1] = string.gsub(allMessages[Moan.currentMsgInstance].options[i][1], Moan.indicatorCharacter.." " , "")
+				allMessages[Moan.currentMsgInstance].options[i][1] = string.gsub(allMessages[Moan.currentMsgInstance].options[i][1], Moan.optionCharacter.." " , "")
 			end
 			-- Add an indicator to the current selection
 			if allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1] ~= "" then
-				allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1] = Moan.indicatorCharacter.." ".. allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1]
+				allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1] = Moan.optionCharacter.." ".. allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1]
 			end
 		end
 
@@ -143,13 +141,10 @@ function Moan.update(dt)
 		    -- Timer done, we need to print a new letter:
 		    -- Adjust position, use string.sub to get sub-string
 		    if typeTimer <= 0 then
-		    	-- Check if we have an audio file
-	        	if type(Moan.typeSound) == "userdata" then
 		    	-- Only make the keypress sound if the next character is a letter
 			        if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
-						Moan.typeSound:play()
+						Moan.playSound(Moan.typeSound)
 			        end
-				end
 		        typeTimer = typeTimerMax
 		        typePosition = typePosition + 1
 
@@ -284,7 +279,7 @@ function Moan.draw()
 
 		-- Next message/continue indicator
 		if Moan.showIndicator then
-			love.graphics.print(">", boxX+boxW-(2.5*padding), boxY+boxH-(padding/2)-fontHeight)
+			love.graphics.print(Moan.indicatorCharacter, boxX+boxW-(2.5*padding), boxY+boxH-(padding/2)-fontHeight)
 		end
 	end
 
@@ -301,15 +296,21 @@ function Moan.keyreleased(key)
 				for i=1, #allMessages[Moan.currentMsgInstance].options do
 					if Moan.currentOption == i then
 						allMessages[Moan.currentMsgInstance].options[i][2]()
-						Moan.optionSound:play()
+						Moan.playSound(Moan.optionSwitchSound)
 					end
 				end
 			end
 			-- Option selection
 			elseif key == "down" or key == "s" then
 				Moan.currentOption = Moan.currentOption + 1
+				if type(Moan.optionSwitchSound) == "userdata" then
+					Moan.playSound(Moan.optionSwitchSound)
+				end
 			elseif key == "up" or key == "w" then
 				Moan.currentOption = Moan.currentOption - 1
+				if type(Moan.optionSwitchSound) == "userdata" then
+					Moan.playSound(Moan.optionSwitchSound)
+				end
 			end
 			-- Return to top/bottom of options on overflow
 			if Moan.currentOption < 1 then
@@ -368,6 +369,15 @@ function Moan.moveCamera()
 		if (allMessages[Moan.currentMsgInstance].x and allMessages[Moan.currentMsgInstance].y) ~= nil then
 			flux.to(Moan.currentCamera, 1, { x = allMessages[Moan.currentMsgInstance].x, y = allMessages[Moan.currentMsgInstance].y }):ease("cubicout")
 		end
+	end
+end
+
+function Moan.setStyle(style)
+end
+
+function Moan.playSound(sound)
+	if type(sound) == "userdata" then
+		sound:play()
 	end
 end
 

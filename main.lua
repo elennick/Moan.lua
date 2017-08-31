@@ -15,9 +15,8 @@ function love.load()
 
 	-- Audio from bfxr
 	Moan.typeSound = love.audio.newSource("assets/typeSound.wav", "static")
-	Moan.optionSound = love.audio.newSource("assets/optionSound.wav", "static")
-	Moan.typeSound:setVolume(0.5)
-	Moan.optionSound:setVolume(0.5)
+	Moan.optionOnSelectSound = love.audio.newSource("assets/optionSelect.wav", "static")
+	Moan.optionSwitchSound = love.audio.newSource("assets/optionSwitch.wav", "static")
 
 	love.graphics.setBackgroundColor(100, 100, 100, 255)
 	math.randomseed(os.time())
@@ -35,8 +34,8 @@ function love.load()
 	avatar = love.graphics.newImage("assets/Obey_Me.png")
 
 	-- Put some messages into the Moan queue
-	Moan.new({"Möan.lua", {0,255,0}}, {"Hello World!"}, {image=avatar})
-	Moan.new({"Tutorial", {255,0,0}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
+	Moan.new({"Möan.lua", {255,105,180}}, {"Hello World!"}, {image=avatar})
+	Moan.new({"Tutorial", {0,191,255}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
 			{x=p2.x, y=p2.y, image=avatar, onstart=function() rand() end})
 	Moan.new("Tutorial", {"Typing sound modulates with speed..."}, {onstart=function() Moan.setSpeed("slow") end, oncomplete=function() Moan.setSpeed("fast") end})
 	Moan.new("Tutorial", {"Here's some options:"}, {
