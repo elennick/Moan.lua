@@ -108,7 +108,7 @@ function Moan.update(dt)
 		end
 		if Moan.showingOptions then
 			-- Constantly update the option prefix
-			for i=1, 3 do
+			for i=1, #allMessages[Moan.currentMsgInstance].options do
 				-- Remove the indicators from other selections
 				allMessages[Moan.currentMsgInstance].options[i][1] = string.gsub(allMessages[Moan.currentMsgInstance].options[i][1], Moan.indicatorCharacter.." " , "")
 			end
@@ -267,9 +267,10 @@ function Moan.draw()
 
 		-- Message options (when shown)
 		if Moan.showingOptions and typing == false then
-			love.graphics.print(allMessages[Moan.currentMsgInstance].options[1][1], textX+padding, optionsY)
-			love.graphics.print(allMessages[Moan.currentMsgInstance].options[2][1], textX+padding, optionsY+optionsSpace)
-			love.graphics.print(allMessages[Moan.currentMsgInstance].options[3][1], textX+padding, optionsY+(2*optionsSpace))
+			for k, option in ipairs(allMessages[Moan.currentMsgInstance].options) do
+				-- First option has no Y padding...
+				love.graphics.print(option[1], textX+padding, optionsY+((k-1)*optionsSpace))
+			end
 		end
 
 		-- Next message/continue indicator
@@ -280,7 +281,7 @@ function Moan.draw()
 
 	-- Reset fonts, run debugger if allowed
 	love.graphics.setFont(defaultFont)
-	Moan.debug()
+	Moan.drawDebug()
 end
 
 function Moan.keyreleased(key)
@@ -303,8 +304,8 @@ function Moan.keyreleased(key)
 			end
 			-- Return to top/bottom of options on overflow
 			if Moan.currentOption < 1 then
-				Moan.currentOption = 3
-			elseif Moan.currentOption > 3 then
+				Moan.currentOption = #allMessages[Moan.currentMsgInstance].options
+			elseif Moan.currentOption > #allMessages[Moan.currentMsgInstance].options then
 				Moan.currentOption = 1
 		end
 	end
@@ -366,7 +367,7 @@ function Moan.clearMessages()
 	allMessages = {}
 end
 
-function Moan.debug()
+function Moan.drawDebug()
 	if Moan.debug == true then
 		log = { -- It works...
 			"typing", typing,

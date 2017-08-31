@@ -70,13 +70,11 @@ function love.keyreleased(key)
 
 	if key == "f" then
 		Moan.advanceMsg()
+	elseif key == "`" then
+		Moan.debug = not Moan.debug
 	elseif key == "c" then
 		Moan.clearMessages()
-	elseif key == "p" then
-		Moan.pause()
-	elseif key == "o" then
-		Moan.resume()
-	elseif key == "s" then
+	elseif key == "m" then
 		Moan.new("Title", {"Message one", "two", "and three..."}, {onstart=function() rand() end})
 	end
 end
