@@ -51,6 +51,13 @@ if Moan.font == nil then
 end
 
 function Moan.new(title, messages, config)
+	if type(title) == "table" then
+		titleColor = title[2]
+		title = title[1]
+	else -- just a string
+		titleColor = {255, 255, 255}
+	end
+
 	-- Config checking / defaulting
 	config = config or {}
 	x = config.x
@@ -63,8 +70,9 @@ function Moan.new(title, messages, config)
 		image = love.graphics.newImage(PATH .. "noImg.png")
 	end
 
+
 	-- Insert the Moan.new into its own instance (table)
-	allMessages[#allMessages+1] = { title=title, messages=messages, x=x, y=y, image=image, options=options, onstart=onstart, oncomplete=oncomplete }
+	allMessages[#allMessages+1] = { title=title, titleColor=titleColor, messages=messages, x=x, y=y, image=image, options=options, onstart=onstart, oncomplete=oncomplete }
 
 	-- Set the last message as "\n", an indicator to change currentMsgInstance
 	allMessages[#allMessages].messages[#messages+1] = "\n"
@@ -228,6 +236,7 @@ function Moan.draw()
 		local titleBoxX = boxX
 		local titleBoxY = boxY-titleBoxH-(padding/2)
 
+		local titleColor = allMessages[Moan.currentMsgInstance].titleColor
 		local titleX = titleBoxX+padding
 		local titleY = titleBoxY+2
 
@@ -248,7 +257,7 @@ function Moan.draw()
 		-- Message title
 		love.graphics.setColor(boxColour)
 		love.graphics.rectangle("fill", titleBoxX, titleBoxY, titleBoxW, titleBoxH)
-		love.graphics.setColor(fontColour)
+		love.graphics.setColor(titleColor)
 		love.graphics.print(Moan.currentTitle, titleX, titleY)
 
 		-- Main message box
@@ -383,7 +392,8 @@ function Moan.drawDebug()
 			"currentHeader", utf8.sub(Moan.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
 			"typeSpeed", Moan.typeSpeed,
 			"typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound),
-			"allMessages.len", #allMessages
+			"allMessages.len", #allMessages,
+			"titleColor", allMessages[Moan.currentMsgInstance].titleColor
 		}
 		for i=1, #log, 2 do
 			love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)

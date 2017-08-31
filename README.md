@@ -56,7 +56,9 @@ end
 ```lua
 Moan.new(title, messages, config)
 ```
-- **title**, string
+- **title**, string or table
+  * if table then title[1] = string, messagebox title
+  * title[2] = table, contains rgb e.g. `{255,0,255}`
 - **messages**, table, contains strings
 - **config**, table, contains message configs, takes;
   * x, camera x position (int) -- Only passed if using camera
@@ -64,19 +66,20 @@ Moan.new(title, messages, config)
   * image, message icon image e.g. `love.graphics.newImage("img.png")`
   * onstart, function to be executed on message start
   * oncomplete, function executed on message end
-  * options, table, contains **3** options
+  * options, table, contains options
     - [1], string describing option
     - [2], function to be exected if option is selected
 
 A full example:
 ```lua
 avatar = love.graphics.newImage("image.png")
-Moan.new("Mike", {"Message one", "two--and", "three..."}, {x=10, y=10, image=avatar,
+Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "three..."}, {x=10, y=10, image=avatar,
                   onstart=function() something() end, oncomplete=function() something() end,
                   options={
                    {"Option one",  function() option1() end},
                    {"Option two",  function() option2() end},
                    {"Option three",function() option3() end}}
+                   {"Option n...", function() optionn() end}}
                   })
 ```
 

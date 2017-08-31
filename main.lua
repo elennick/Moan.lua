@@ -35,8 +35,8 @@ function love.load()
 	avatar = love.graphics.newImage("assets/Obey_Me.png")
 
 	-- Put some messages into the Moan queue
-	Moan.new("Möan.lua", {"Hello World!"}, {image=avatar})
-	Moan.new("Tutorial", {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
+	Moan.new({"Möan.lua", {0,255,0}}, {"Hello World!"}, {image=avatar})
+	Moan.new({"Tutorial", {255,0,0}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
 			{x=p2.x, y=p2.y, image=avatar, onstart=function() rand() end})
 	Moan.new("Tutorial", {"Typing sound modulates with speed..."}, {onstart=function() Moan.setSpeed("slow") end, oncomplete=function() Moan.setSpeed("fast") end})
 	Moan.new("Tutorial", {"Here's some options:"}, {
@@ -48,6 +48,7 @@ end
 function love.update(dt)
 	flux.update(dt)
 	Moan.update(dt)
+	require("lovebird").update()
 
 	-- Move the camera around
 	camera:rotate(0.01)
