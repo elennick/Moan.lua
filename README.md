@@ -14,11 +14,14 @@ Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
 - UTF-8 support
 - Optional HUMP camera integration
 - Message box icons
+- Autowrapped text
 
 ### Current bugs
+- Auto-wrap doesn't work well with non-english text
 - UI is kind of dodgy with placement of text, you may have to tweak some values if you're using your own font
 
 ### To do:
+- Improves Auto-wrap algo. to calculate string length (in px) based on character width
 - Rich text, i.e. coloured/bold/italic text
 
 ## How to
@@ -162,6 +165,7 @@ Removes all messages from the queue and closes the messagebox.
 ## Configuration
 
 ### Controls
+* `Moan.autoWrap` - Pre-wrap sentences by adding `\n`'s into sentences (bool)
 * `Moan.typeSound` - Typing sound, should be a very short clip
   - e.g. `Moan.typeSound = love.audio.newSource("typeSound.wav", "static")`
 * `Moan.optionSound` - Sound to be played when a option is selected

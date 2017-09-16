@@ -68,9 +68,26 @@ function Moan.new(title, messages, config)
 		image = love.graphics.newImage(PATH .. "noImg.png")
 	end
 
+	-- Insert \n before text is printed, stops half-words being printed
+	-- and then wrapped onto new line
+	if Moan.autoWrap then
+		for i=1, #messages do
+			messages[i] = Moan.wordwrap(messages[i], 65)
+		end
+	end
 
 	-- Insert the Moan.new into its own instance (table)
-	allMessages[#allMessages+1] = { title=title, titleColor=titleColor, messages=messages, x=x, y=y, image=image, options=options, onstart=onstart, oncomplete=oncomplete }
+	allMessages[#allMessages+1] = {
+		title=title,
+		titleColor=titleColor,
+		messages=messages,
+		x=x,
+		y=y,
+		image=image,
+		options=options,
+		onstart=onstart,
+		oncomplete=oncomplete
+	}
 
 	-- Set the last message as "\n", an indicator to change currentMsgInstance
 	allMessages[#allMessages].messages[#messages+1] = "\n"
@@ -267,7 +284,11 @@ function Moan.draw()
 		love.graphics.pop()
 
 		-- Message text
-		love.graphics.printf(printedText, textX, textY, msgLimit)
+		if Moan.autoWrap then
+			love.graphics.print(printedText, textX, textY)
+		else
+			love.graphics.printf(printedText, textX, textY, msgLimit)
+		end
 
 		-- Message options (when shown)
 		if Moan.showingOptions and typing == false then
@@ -303,14 +324,10 @@ function Moan.keyreleased(key)
 			-- Option selection
 			elseif key == "down" or key == "s" then
 				Moan.currentOption = Moan.currentOption + 1
-				if type(Moan.optionSwitchSound) == "userdata" then
-					Moan.playSound(Moan.optionSwitchSound)
-				end
+				Moan.playSound(Moan.optionSwitchSound)
 			elseif key == "up" or key == "w" then
 				Moan.currentOption = Moan.currentOption - 1
-				if type(Moan.optionSwitchSound) == "userdata" then
-					Moan.playSound(Moan.optionSwitchSound)
-				end
+				Moan.playSound(Moan.optionSwitchSound)
 			end
 			-- Return to top/bottom of options on overflow
 			if Moan.currentOption < 1 then
@@ -480,4 +497,36 @@ function utf8.sub (s, i, j)
    end
 
    return string.sub(s, startByte, endByte)
+end
+
+-- ripped from https://github.com/rxi/lume
+function Moan.wordwrap(str, limit)
+  limit = limit or 72
+  local check
+  if type(limit) == "number" then
+    check = function(s) return #s >= limit end
+  else
+    check = limit
+  end
+  local rtn = {}
+  local line = ""
+  for word, spaces in str:gmatch("(%S+)(%s*)") do
+    local s = line .. word
+    if check(s) then
+      table.insert(rtn, line .. "\n")
+      line = word
+    else
+      line = s
+    end
+    for c in spaces:gmatch(".") do
+      if c == "\n" then
+        table.insert(rtn, line .. "\n")
+        line = ""
+      else
+        line = line .. c
+      end
+    end
+  end
+  table.insert(rtn, line)
+  return table.concat(rtn)
 end
