@@ -56,12 +56,12 @@ end
 function love.draw()
 	-- Attach the HUMP camera to the objects
     camera:attach()
-		love.graphics.rectangle("fill", p1.x, p1.y, 16, 16)
-		love.graphics.rectangle("fill", p2.x, p2.y, 16, 16)
-		love.graphics.rectangle("fill", p3.x, p3.y, 16, 16)
+  		love.graphics.rectangle("fill", p1.x, p1.y, 16, 16)
+  		love.graphics.rectangle("fill", p2.x, p2.y, 16, 16)
+  		love.graphics.rectangle("fill", p3.x, p3.y, 16, 16)
     camera:detach()
 
-    -- Moan.draw() should be drawn last since we want it to be ontop of everything else
+  -- Moan.draw() should be drawn last since we want it to be ontop of everything else
 	Moan.draw()
 end
 

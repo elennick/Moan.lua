@@ -24,7 +24,7 @@ Moan = {
   currentOption = 1,        -- Key of option function in Moan.new option array
   currentImage = nil,       -- Avatar image
 
-  _VERSION     = '0.2.7',
+  _VERSION     = '0.2.8',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple messagebox system for LÖVE',
 
@@ -294,7 +294,7 @@ function Moan.draw()
 
     -- Message options (when shown)
     if Moan.showingOptions and typing == false then
-      for k, option in ipairs(allMessages[Moan.currentMsgInstance].options) do
+      for k, option in pairs(allMessages[Moan.currentMsgInstance].options) do
         -- First option has no Y padding...
         love.graphics.print(option[1], textX+padding, optionsY+((k-1)*optionsSpace))
       end
@@ -422,7 +422,7 @@ function Moan.drawDebug()
       "typeSpeed", Moan.typeSpeed,
       "typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound),
       "allMessages.len", #allMessages,
-      --"titleColor", allMessages[Moan.currentMsgInstance].titleColor
+      --"titleColor", unpack(allMessages[Moan.currentMsgInstance].titleColor)
     }
     for i=1, #log, 2 do
       love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
