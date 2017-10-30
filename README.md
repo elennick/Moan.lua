@@ -16,10 +16,6 @@ Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
 - Message box icons
 - Autowrapped text
 
-### Current bugs
-- Auto-wrap doesn't work well with non-english text
-- UI is kind of dodgy with placement of text, you may have to tweak some values if you're using your own font
-
 ### To do:
 - Add simple theming interface
 - Improves Auto-wrap algo. to calculate string length (in px) based on character width
