@@ -16,6 +16,7 @@ Moan = {
   selectButton = "space",   -- Key that advances message
   typeSpeed = 0.01,         -- Delay per character typed out
   debug = false,            -- Display some debugging
+  allMsgs = {},
 
   history = {},             -- contains all previous messages + titles
   currentMessage  = "",
@@ -24,15 +25,12 @@ Moan = {
   currentOption = 1,        -- Key of option function in Moan.new option array
   currentImage = nil,       -- Avatar image
 
-  _VERSION     = '0.2.8',
+  _VERSION     = '0.2.9',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple messagebox system for LÖVE',
 
   UI = {}
 }
-
--- Create the message instance container
-allMessages = {}
 
 -- Section of the text printed so far
 local printedText  = ""
@@ -58,13 +56,13 @@ function Moan.new(title, messages, config)
   end
 
   -- Config checking / defaulting
-  config = config or {}
-  x = config.x
-  y = config.y
-  image = config.image or "nil"
-  options = config.options -- or {{"",function()end},{"",function()end},{"",function()end}}
-  onstart = config.onstart or function() end
-  oncomplete = config.oncomplete or function() end
+  local config = config or {}
+  local x = config.x
+  local y = config.y
+  local image = config.image or "nil"
+  local options = config.options -- or {{"",function()end},{"",function()end},{"",function()end}}
+  local onstart = config.onstart or function() end
+  local oncomplete = config.oncomplete or function() end
   if image == nil or type(image) ~= "userdata" then
     image = love.graphics.newImage(PATH .. "noImg.png")
   end
@@ -78,7 +76,7 @@ function Moan.new(title, messages, config)
   end
 
   -- Insert the Moan.new into its own instance (table)
-  allMessages[#allMessages+1] = {
+  Moan.allMsgs[#Moan.allMsgs+1] = {
     title=title,
     titleColor=titleColor,
     messages=messages,
@@ -92,7 +90,7 @@ function Moan.new(title, messages, config)
   Moan.history[#Moan.history+1] = {title, messages}
 
   -- Set the last message as "\n", an indicator to change currentMsgInstance
-  allMessages[#allMessages].messages[#messages+1] = "\n"
+  Moan.allMsgs[#Moan.allMsgs].messages[#messages+1] = "\n"
   Moan.showingMessage = true
 
   -- Only run .onstart()/setup if first message instance on first Moan.new
@@ -100,12 +98,12 @@ function Moan.new(title, messages, config)
   if Moan.currentMsgInstance == 1 then
     -- Set the first message up, after this is set up via advanceMsg()
     typePosition = 0
-    Moan.currentMessage = allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey]
-    Moan.currentTitle = allMessages[Moan.currentMsgInstance].title
-    Moan.currentImage = allMessages[Moan.currentMsgInstance].image
+    Moan.currentMessage = Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey]
+    Moan.currentTitle = Moan.allMsgs[Moan.currentMsgInstance].title
+    Moan.currentImage = Moan.allMsgs[Moan.currentMsgInstance].image
     Moan.showingOptions = false
     -- Run the first startup function
-    allMessages[Moan.currentMsgInstance].onstart()
+    Moan.allMsgs[Moan.currentMsgInstance].onstart()
   end
 end
 
@@ -128,18 +126,18 @@ function Moan.update(dt)
     end
 
     -- Check if we're the 2nd to last message, verify if an options table exists, on next advance show options
-    if allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" and type(allMessages[Moan.currentMsgInstance].options) == "table" then
+    if Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" and type(Moan.allMsgs[Moan.currentMsgInstance].options) == "table" then
       Moan.showingOptions = true
     end
     if Moan.showingOptions then
       -- Constantly update the option prefix
-      for i=1, #allMessages[Moan.currentMsgInstance].options do
+      for i=1, #Moan.allMsgs[Moan.currentMsgInstance].options do
         -- Remove the indicators from other selections
-        allMessages[Moan.currentMsgInstance].options[i][1] = string.gsub(allMessages[Moan.currentMsgInstance].options[i][1], Moan.optionCharacter.." " , "")
+        Moan.allMsgs[Moan.currentMsgInstance].options[i][1] = string.gsub(Moan.allMsgs[Moan.currentMsgInstance].options[i][1], Moan.optionCharacter.." " , "")
       end
       -- Add an indicator to the current selection
-      if allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1] ~= "" then
-        allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1] = Moan.optionCharacter.." ".. allMessages[Moan.currentMsgInstance].options[Moan.currentOption][1]
+      if Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1] ~= "" then
+        Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1] = Moan.optionCharacter.." ".. Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1]
       end
     end
 
@@ -151,28 +149,25 @@ function Moan.update(dt)
 
     --https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
     if typePosition <= string.len(Moan.currentMessage) then
-
-        -- Only decrease the timer when not paused
-        if not Moan.paused then
-          typeTimer = typeTimer - dt
+      -- Only decrease the timer when not paused
+      if not Moan.paused then
+        typeTimer = typeTimer - dt
       end
-
-        -- Timer done, we need to print a new letter:
-        -- Adjust position, use string.sub to get sub-string
-        if typeTimer <= 0 then
-          -- Only make the keypress sound if the next character is a letter
-              if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
-            Moan.playSound(Moan.typeSound)
-              end
-            typeTimer = typeTimerMax
-            typePosition = typePosition + 1
-
-            -- UTF8 support, thanks @FluffySifilis
+      -- Timer done, we need to print a new letter:
+      -- Adjust position, use string.sub to get sub-string
+      if typeTimer <= 0 then
+        -- Only make the keypress sound if the next character is a letter
+        if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
+          Moan.playSound(Moan.typeSound)
+        end
+        typeTimer = typeTimerMax
+        typePosition = typePosition + 1
+          -- UTF8 support, thanks @FluffySifilis
         local byteoffset = utf8.offset(Moan.currentMessage, typePosition)
         if byteoffset then
           printedText = string.sub(Moan.currentMessage, 0, byteoffset - 1)
         end
-        end
+      end
     end
   end
 end
@@ -180,12 +175,12 @@ end
 function Moan.advanceMsg()
   if Moan.showingMessage then
     -- Check if we're at the last message in the instances queue (+1 because "\n" indicated end of instance)
-    if allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
+    if Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
       -- Last message in instance, so run the final function.
-      allMessages[Moan.currentMsgInstance].oncomplete()
+      Moan.allMsgs[Moan.currentMsgInstance].oncomplete()
 
-      -- Check if we're the last instance in allMessages
-      if allMessages[Moan.currentMsgInstance+1] == nil then
+      -- Check if we're the last instance in Moan.allMsgs
+      if Moan.allMsgs[Moan.currentMsgInstance+1] == nil then
         Moan.currentMsgInstance = 1
         Moan.currentMsgKey = 1
         Moan.currentOption = 1
@@ -193,7 +188,7 @@ function Moan.advanceMsg()
         Moan.showingMessage = false
         typePosition = 0
         Moan.showingOptions = false
-        allMessages = {}
+        Moan.allMsgs = {}
       else
         -- We're not the last instance, so we can go to the next one
         -- Reset the msgKey such that we read the first msg of the new instance
@@ -215,11 +210,11 @@ function Moan.advanceMsg()
   -- Check showingMessage - throws an error if next instance is nil
   if Moan.showingMessage then
     if Moan.currentMsgKey == 1 then
-      allMessages[Moan.currentMsgInstance].onstart()
+      Moan.allMsgs[Moan.currentMsgInstance].onstart()
     end
-    Moan.currentMessage = allMessages[Moan.currentMsgInstance].messages[Moan.currentMsgKey] or ""
-    Moan.currentTitle = allMessages[Moan.currentMsgInstance].title or ""
-    Moan.currentImage = allMessages[Moan.currentMsgInstance].image
+    Moan.currentMessage = Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey] or ""
+    Moan.currentTitle = Moan.allMsgs[Moan.currentMsgInstance].title or ""
+    Moan.currentImage = Moan.allMsgs[Moan.currentMsgInstance].image
   end
 end
 
@@ -250,7 +245,7 @@ function Moan.draw()
     local titleBoxX = boxX
     local titleBoxY = boxY-titleBoxH-(padding/2)
 
-    local titleColor = allMessages[Moan.currentMsgInstance].titleColor
+    local titleColor = Moan.allMsgs[Moan.currentMsgInstance].titleColor
     local titleX = titleBoxX+padding
     local titleY = titleBoxY+2
 
@@ -294,7 +289,7 @@ function Moan.draw()
 
     -- Message options (when shown)
     if Moan.showingOptions and typing == false then
-      for k, option in pairs(allMessages[Moan.currentMsgInstance].options) do
+      for k, option in pairs(Moan.allMsgs[Moan.currentMsgInstance].options) do
         -- First option has no Y padding...
         love.graphics.print(option[1], textX+padding, optionsY+((k-1)*optionsSpace))
       end
@@ -319,11 +314,11 @@ end
 function Moan.keyreleased(key)
   if Moan.showingOptions then
     if key == Moan.selectButton and not typing then
-      if Moan.currentMsgKey == #allMessages[Moan.currentMsgInstance].messages-1 then
+      if Moan.currentMsgKey == #Moan.allMsgs[Moan.currentMsgInstance].messages-1 then
         -- Execute the selected function
-        for i=1, #allMessages[Moan.currentMsgInstance].options do
+        for i=1, #Moan.allMsgs[Moan.currentMsgInstance].options do
           if Moan.currentOption == i then
-            allMessages[Moan.currentMsgInstance].options[i][2]()
+            Moan.allMsgs[Moan.currentMsgInstance].options[i][2]()
             Moan.playSound(Moan.optionSwitchSound)
           end
         end
@@ -338,8 +333,8 @@ function Moan.keyreleased(key)
       end
       -- Return to top/bottom of options on overflow
       if Moan.currentOption < 1 then
-        Moan.currentOption = #allMessages[Moan.currentMsgInstance].options
-      elseif Moan.currentOption > #allMessages[Moan.currentMsgInstance].options then
+        Moan.currentOption = #Moan.allMsgs[Moan.currentMsgInstance].options
+      elseif Moan.currentOption > #Moan.allMsgs[Moan.currentMsgInstance].options then
         Moan.currentOption = 1
     end
   end
@@ -350,14 +345,15 @@ function Moan.keyreleased(key)
       -- Get the text left and right of "--"
       leftSide = string.sub(Moan.currentMessage, 1, string.len(printedText))
       rightSide = string.sub(Moan.currentMessage, string.len(printedText)+3, string.len(Moan.currentMessage))
-      -- And then concatenate them, thanks @pfirsich
+      -- And then concatenate them, kudos to @pfirsich for the help :)
       Moan.currentMessage = leftSide .. " " .. rightSide
       -- Put the typerwriter back a bit and start up again
       typePosition = typePosition - 1
       typeTimer = 0
     else
       if typing == true then
-        -- Skip the typing completely
+        -- Skip the typing completely, replace all -- with spaces since we're skipping the pauses
+        Moan.currentMessage = string.gsub(Moan.currentMessage, "%-%-", " ")
         printedText = Moan.currentMessage
         typePosition = string.len(Moan.currentMessage)
       else
@@ -390,8 +386,8 @@ function Moan.moveCamera()
   -- Only move the camera if one exists
   if Moan.currentCamera ~= nil then
     -- Move the camera to the new instances position
-    if (allMessages[Moan.currentMsgInstance].x and allMessages[Moan.currentMsgInstance].y) ~= nil then
-      flux.to(Moan.currentCamera, 1, { x = allMessages[Moan.currentMsgInstance].x, y = allMessages[Moan.currentMsgInstance].y }):ease("cubicout")
+    if (Moan.allMsgs[Moan.currentMsgInstance].x and Moan.allMsgs[Moan.currentMsgInstance].y) ~= nil then
+      flux.to(Moan.currentCamera, 1, { x = Moan.allMsgs[Moan.currentMsgInstance].x, y = Moan.allMsgs[Moan.currentMsgInstance].y }):ease("cubicout")
     end
   end
 end
@@ -411,7 +407,11 @@ function Moan.clearMessages()
   Moan.showingMessage = false -- Prevents crashing
   Moan.currentMsgKey = 1
   Moan.currentMsgInstance = 1
-  allMessages = {}
+  Moan.allMsgs = {}
+end
+
+function Moan.defMsgContainer(table)
+  Moan.allMsgs = table
 end
 
 function Moan.drawDebug()
@@ -430,8 +430,8 @@ function Moan.drawDebug()
       "currentHeader", utf8.sub(Moan.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
       "typeSpeed", Moan.typeSpeed,
       "typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound),
-      "allMessages.len", #allMessages,
-      --"titleColor", unpack(allMessages[Moan.currentMsgInstance].titleColor)
+      "Moan.allMsgs.len", #Moan.allMsgs,
+      --"titleColor", unpack(Moan.allMsgs[Moan.currentMsgInstance].titleColor)
     }
     for i=1, #log, 2 do
       love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)

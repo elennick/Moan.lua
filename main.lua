@@ -10,7 +10,7 @@ function love.load()
 	Moan.font = love.graphics.newFont("assets/Pixel UniCode.ttf", 32)
 
 	-- Add font fallbacks for Japanese characters
-	JPfallback = love.graphics.newFont("assets/JPfallback.ttf", 32)
+	local JPfallback = love.graphics.newFont("assets/JPfallback.ttf", 32)
 	Moan.font:setFallbacks(JPfallback)
 
 	-- Audio from bfxr (https://www.bfxr.net/)
@@ -26,7 +26,7 @@ function love.load()
 	p2 = { x=400, y=150 }
 	p3 = { x=200, y=300 }
 
-	-- Create a HUMP camera and pass it to Moan
+	-- Create a HUMP camera and let Moan use it
 	camera = Camera(p1.x, p1.y)
 	Moan.setCamera(camera)
 
