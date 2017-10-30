@@ -75,7 +75,7 @@ A full example:
 ```lua
 avatar = love.graphics.newImage("image.png")
 Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
-                  onstart=function() something() end, oncomplete=function() something() end,
+                  onstart=function() camera:move(100, 20) end, oncomplete=function() Moan.setSpeed("slow") end,
                   options={
                    {"Option one",  function() option1() end},
                    {"Option two",  function() option2() end},
@@ -90,7 +90,7 @@ There can be "infinite" options, however the options will probably overflow depe
 #### Pauses
 
 ```lua
-Moan.new("Title", {"Hello--World--This--Is--Lots--of pauses."})
+Moan.new("Title", {"Hello--World--This--Is--a lot--of pauses."})
 ```
 
 A double dash, `--`, causes Moan.lua to stop typing, and will only continue when `Moan.selectButton` is pressed, each `--` will be replaced with space.
@@ -104,6 +104,7 @@ Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://git
 Moan.setCamera(HUMPcameraToUse)
 ```
 
+Example;
 ```lua
 Camera = require("libs/hump/camera")
 flux = require("libs/flux")
@@ -118,7 +119,7 @@ end
 
 function love.update(dt)
   flux.update(dt)
-  Moan.update(dt
+  Moan.update(dt)
 end
 
 function love.draw()
@@ -160,11 +161,23 @@ function love.keypressed(key)
 end
 
 function love.released(key)
-  Moan.released(key)
+  Moan.keyreleased(key)
 end
 ```
 
 Pass keys to Moan to cycle through messages
+
+### Moan.defMsgContainer()
+
+```lua
+aMessageContainer = {}
+Moan.defMsgContainer(aMessageContainer)
+
+Moan.new("Test", "Testing defMsgContainer")
+print(aMessageContainer[1].title) -- => "Test"
+```
+
+Define an alternative table to store your messages for whatever reason... As opposed to default `Moan.allMsgs` table.
 
 ## Configuration
 
