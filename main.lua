@@ -1,19 +1,19 @@
 require("Moan/Moan")
 
-Camera = require("libs.camera")
-flux = require("libs.flux")
+Camera = require("assets.camera")
+flux = require("assets.flux")
 
 function love.load()
 	-- The FontStruction “Pixel UniCode” (https://fontstruct.com/fontstructions/show/908795)
 	-- by “ivancr72” is licensed under a Creative Commons Attribution license
-	-- (http://creativecommons.org/licenses/by/3.0/).
+	-- (http://creativecommons.org/licenses/by/3.0/)
 	Moan.font = love.graphics.newFont("assets/Pixel UniCode.ttf", 32)
 
 	-- Add font fallbacks for Japanese characters
 	JPfallback = love.graphics.newFont("assets/JPfallback.ttf", 32)
 	Moan.font:setFallbacks(JPfallback)
 
-	-- Audio from bfxr
+	-- Audio from bfxr (https://www.bfxr.net/)
 	Moan.typeSound = love.audio.newSource("assets/typeSound.wav", "static")
 	Moan.optionOnSelectSound = love.audio.newSource("assets/optionSelect.wav", "static")
 	Moan.optionSwitchSound = love.audio.newSource("assets/optionSwitch.wav", "static")
@@ -36,36 +36,43 @@ function love.load()
 	-- Put some messages into the Moan queue
 	Moan.new({"Möan.lua", {255,105,180}}, {"Hello World!"}, {image=avatar})
 	Moan.new({"Tutorial", {0,191,255}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
-			{x=p2.x, y=p2.y, image=avatar, onstart=function() rand() end})
+			     {x=p2.x, y=p2.y, image=avatar, onstart=function() rand() end})
 	Moan.new("Tutorial", {"Typing sound modulates with speed..."}, {onstart=function() Moan.setSpeed("slow") end, oncomplete=function() Moan.setSpeed("fast") end})
-	Moan.new("Tutorial", {"Here's some options:"}, {
+  Moan.new("Tutorial", {"Here's some options:"}, {
 			options={{"Red", function() red() end},
 					 {"Blue", function() blue() end},
 					 {"Green", function() green() end}}})
 end
 
 function love.update(dt)
-	flux.update(dt)
+	-- Update Moan
 	Moan.update(dt)
-	require("lovebird").update()
 
-	-- Move the camera around
-	camera:rotate(0.01)
+	-- Update external libs (optional)
+	flux.update(dt)
+	require("assets.lovebird").update()
 end
 
 function love.draw()
-	-- Attach the HUMP camera to the objects
-    camera:attach()
-  		love.graphics.rectangle("fill", p1.x, p1.y, 16, 16)
-  		love.graphics.rectangle("fill", p2.x, p2.y, 16, 16)
-  		love.graphics.rectangle("fill", p3.x, p3.y, 16, 16)
-    camera:detach()
+  -- Attach the HUMP camera to the objects
+  camera:attach()
+  	love.graphics.rectangle("fill", p1.x, p1.y, 16, 16)
+  	love.graphics.rectangle("fill", p2.x, p2.y, 16, 16)
+  	love.graphics.rectangle("fill", p3.x, p3.y, 16, 16)
+  camera:detach()
+  love.graphics.print("Möan.lua demo - twentytwoo\n ==================\n" ..
+                      "'spacebar': Cycle through messages \n" ..
+                      "'f': Force message cycle \n" ..
+                      "'c': Clear all messages \n" ..
+                      "'m': Add a single message to the queue \n" ..
+                      "'`': Enable debugger", 10, 300)
 
   -- Moan.draw() should be drawn last since we want it to be ontop of everything else
-	Moan.draw()
+  Moan.draw()
 end
 
 function love.keyreleased(key)
+  -- Pass keypresses to Moan
 	Moan.keyreleased(key)
 
 	if key == "f" then
@@ -78,6 +85,8 @@ function love.keyreleased(key)
 		Moan.new("Title", {"Message one", "two", "and three..."}, {onstart=function() rand() end})
 	end
 end
+
+-- DEMO FUNCTIONS ===========================================================================
 
 function rand()
 	love.graphics.setBackgroundColor(math.random(255), math.random(255), math.random(255))

@@ -21,8 +21,10 @@ Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
 - UI is kind of dodgy with placement of text, you may have to tweak some values if you're using your own font
 
 ### To do:
+- Add simple theming interface
 - Improves Auto-wrap algo. to calculate string length (in px) based on character width
 - Rich text, i.e. coloured/bold/italic text
+- Possibly go towards a more OO approach
 
 ## How to
 * Download the `Moan/` folder in this repo
@@ -30,10 +32,9 @@ Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
 * Add the following to your main.lua
 
 ```lua
-require('Moan/Moan')
+require('Moan')
 
 function love.load()
-  -- Open a message
   Moan.new("Title", {"Hello World!"})
 end
 
@@ -45,11 +46,12 @@ function love.draw()
     -- Draw your stuff here
 
     -- We want the messagebox to be ontop of all other elements, so we draw it last
+    -- Alternatively use a z-orderer (https://love2d.org/wiki/Tutorial:Drawing_Order)
     Moan.draw()
 end
 
 function love.keyreleased(key)
-    Moan.keyreleased(key)
+    Moan.keyreleased(key) -- or Moan.keypressed(key)
 end
 ```
 
@@ -64,19 +66,19 @@ Moan.new(title, messages, config)
   * title[2] = table, contains rgb e.g. `{255,0,255}`
 - **messages**, table, contains strings
 - **config**, table, contains message configs, takes;
-  * x, camera x position (int) -- Only passed if using camera
-  * y, camera y position (int) -- See Moan.setCamera()
-  * image, message icon image e.g. `love.graphics.newImage("img.png")`
-  * onstart, function to be executed on message start
-  * oncomplete, function executed on message end
-  * options, table, contains options
+  * `x`, camera x position (int) -- Only passed if using camera
+  * `y`, camera y position (int) -- See Moan.setCamera()
+  * `image`, message icon image e.g. `love.graphics.newImage("img.png")`
+  * `onstart`, function to be executed on message start
+  * `oncomplete`, function executed on message end
+  * `options`, table, contains multiple-choice options
     - [1], string describing option
     - [2], function to be exected if option is selected
 
 A full example:
 ```lua
 avatar = love.graphics.newImage("image.png")
-Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "three..."}, {x=10, y=10, image=avatar,
+Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
                   onstart=function() something() end, oncomplete=function() something() end,
                   options={
                    {"Option one",  function() option1() end},
@@ -86,19 +88,10 @@ Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "three..."}, {x=10, y=
                   })
 ```
 
-For a message with multiple choice, the last arguement in the function is a table, with three more tables, each containing the option text, and the function that should be ran when the option is selected.
-```lua
-Moan.new("Title", {"Array", "of", "messages"}, {image="img.png",
-         options={
-           {"Option one",  function() option1() end},
-           {"Option two",  function() option2() end},
-           {"Option three",function() option3() end}}
-         })
-```
-
-On the final message in the array of messages, the three options will be displayed. Upon pressing return, the function relative to the open will be called.
-
+On the final message in the array of messages, the options will be displayed. Upon pressing return, the function relative to the open will be called.
 There can be "infinite" options, however the options will probably overflow depending on your UI configuration.
+
+#### Pauses
 
 ```lua
 Moan.new("Title", {"Hello--World--This--Is--Lots--of pauses."})
@@ -112,7 +105,7 @@ Sets the HUMP camera for Moan to use.
 Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump).
 
 ```lua
-Moan.setCamera(camToUse)
+Moan.setCamera(HUMPcameraToUse)
 ```
 
 ```lua
@@ -152,7 +145,7 @@ Moan.setSpeed(speed)
 - `"fast"`
 - `"medium"`
 - `"slow"`
-- Or some number, default is 0.01
+- Or some number, default is `0.01`
 
 ### Moan.clearMessages()
 
@@ -161,6 +154,21 @@ Moan.clearMessages()
 ```
 
 Removes all messages from the queue and closes the messagebox.
+
+
+### Moan.keyreleased / Moan.keypressed
+
+```lua
+function love.keypressed(key)
+  Moan.keypressed(key)
+end
+
+function love.released(key)
+  Moan.released(key)
+end
+```
+
+Pass keys to Moan to cycle through messages
 
 ## Configuration
 
@@ -178,6 +186,8 @@ Removes all messages from the queue and closes the messagebox.
 ### UI
 * `Moan.font` - Messagebox font
   - e.g. `Moan.font = love.graphics.newFont("Moan/main.ttf", 32)`
+
+Currently these values are local to Moan.draw() so you'll have to edit the Moan.lua source
 * `padding` - Image, text padding
 * `boxH` - Height of messagebox
 * `boxW` - Width of messagebox

@@ -311,6 +311,11 @@ function Moan.draw()
   Moan.drawDebug()
 end
 
+function Moan.keypressed(key)
+  -- Lazily handle the keypress
+  Moan.keyreleased(key)
+end
+
 function Moan.keyreleased(key)
   if Moan.showingOptions then
     if key == Moan.selectButton and not typing then
@@ -391,7 +396,9 @@ function Moan.moveCamera()
   end
 end
 
-function Moan.setStyle(style)
+function Moan.setTheme(style)
+  for _, setting in pairs(Moan.UI) do
+  end
 end
 
 function Moan.playSound(sound)
@@ -402,6 +409,8 @@ end
 
 function Moan.clearMessages()
   Moan.showingMessage = false -- Prevents crashing
+  Moan.currentMsgKey = 1
+  Moan.currentMsgInstance = 1
   allMessages = {}
 end
 
