@@ -1,30 +1,62 @@
+-------------------------------------------------
+-- eek.lua (formerly Möan.lua)
+-- A simple messagebox system for LÖVE <br><br> Forum link: 
+-- [https://love2d.org/forums/viewtopic.php?f=5&t=84110](https://love2d.org/forums/viewtopic.php?f=5&t=84110)
+-- <br>GitHub: [https://github.com/twentytwoo/eek.lua](https://github.com/twentytwoo/eek.lua)
+-- <br><br><img src="../preview.gif" style="max-width: 100%">
+-- @usage eek.speak("eek", {"W-Wh--What are you doing here?!", "Stay away from me!"})
 --
--- eek.lua
--- formerly Möan.lua
---
--- Copyright (c) 2017 twentytwoo
---
--- This library is free software; you can redistribute it and/or modify it
--- under the terms of the MIT license. See LICENSE for details.
---
+-- @module eek
+-- @author May W.
+-- @license MIT
+-- @copyright twentytwoo, 2017
+-- @todo
+-- Add simple theming interface
+-- Improves Auto-wrap algo. to calculate string length (in px) based on character width
+-- Rich text, i.e. coloured/bold/italic text
+-- Possibly go towards a more OO approach
+
+-------------------------------------------------
 
 local utf8 = require("utf8")
-local PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
+
+-------------------------------------------------
+-- Main configuration table
+--
+-- @table eek
+-- @string indicatorCharacter Next message indicator, (default `">"`)
+-- @string optionCharacter Option selection prefix, (default `"- "`)
+-- @int indicatorDelay Time between next message indicator being toggled, (default `25`)
+-- @string selectButton Key that advanced to next message, (default `"space"`)
+-- @int typeSpeed Delay between character being printed via the typewriter
+-- @bool debug Display debug information
+-- @tparam table allMsgs Contains messages (if not overriden by eek.defMsgContainer())
+-- @tparam table history Contains all messages that have been called
+-- @string currentMessage Current full message
+-- @int currentMsgInstance Current eek.speak() instance+
+-- @int currentMsgKey Current key of current instances messages table
+-- @int currentOption Current key of selected option table
+-- @param userdata currentImage Current messagebox Love image object
+-- @string _VERSION eek version
+-- @string _URL eek repo url
+-- @string _DESCRIPTION Short description of the library
+-- @tparam table UI UI configuration
+-------------------------------------------------
 eek = {
-  indicatorCharacter = ">", -- Next message indicator
-  optionCharacter = "- ",   -- Option select character
-  indicatorDelay = 25,      -- Delay between each flash of indicator
-  selectButton = "space",   -- Key that advances message
-  typeSpeed = 0.01,         -- Delay per character typed out
-  debug = false,            -- Display some debugging
+  indicatorCharacter = ">",
+  optionCharacter = "- ",
+  indicatorDelay = 25,
+  selectButton = "space",
+  typeSpeed = 0.01,
+  debug = false,
   allMsgs = {},
 
-  history = {},             -- contains all previous messages + titles
+  history = {},
   currentMessage  = "",
-  currentMsgInstance = 1,   -- The eek.speak function instance
-  currentMsgKey= 1,         -- Key of value in the eek.speak messages
-  currentOption = 1,        -- Key of option function in eek.speak option array
-  currentImage = nil,       -- Avatar image
+  currentMsgInstance = 1,
+  currentMsgKey= 1,
+  currentOption = 1,
+  currentImage = nil,
 
   _VERSION     = '0.2.9',
   _URL         = 'https://github.com/twentytwoo/eek.lua',
@@ -48,6 +80,32 @@ if eek.font == nil then
   eek.font = defaultFont
 end
 
+-------------------------------------------------
+-- Message instance constructor
+--
+-- @string title Title box text, default colour
+-- <li><code>title:</code>(<a href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a>)</li>
+-- <ul style="margin-left: 20px">
+--  <li><code>[1]:</code> (<a href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a>) Messagebox title text</li>
+--  <li><code>[2]:</code> (<a href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a>) Messagebox title colour; <code>{255, 100, 10}</code></li>
+--</ul>
+-- @tparam table messages
+-- @tparam table config
+--
+-- @see config
+-- @see options
+-- @see messages
+-- @usage
+-- avatar = love.graphics.newImage("image.png")
+-- eek.speak({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
+--                   onstart=function() camera:move(100, 20) end, oncomplete=function() eek.setSpeed("slow") end,
+--                   options={
+--                    {"Option one",  function() option1() end},
+--                    {"Option two",  function() option2() end},
+--                    {"Option three",function() option3() end}}
+--                    {"Option n...", function() optionn() end}}
+--                   })
+-------------------------------------------------
 function eek.speak(title, messages, config)
   if type(title) == "table" then
     titleColor = title[2]
@@ -108,6 +166,15 @@ function eek.speak(title, messages, config)
   end
 end
 
+-------------------------------------------------
+-- eek Message updater
+-- @int dt love delta-time
+--
+-- @usage
+-- function love.update(dt)
+--   eek.update(dt)
+-- end
+-------------------------------------------------
 function eek.update(dt)
   -- Check if the output string is equal to final string, else we must be still typing it
   if printedText == eek.currentMessage then
@@ -173,6 +240,11 @@ function eek.update(dt)
   end
 end
 
+-------------------------------------------------
+-- Force eek to progress onto the next message in the message queue
+-- @usage
+-- if love.keyboard.isDown("space") then eek.advanceMsg() end
+-------------------------------------------------
 function eek.advanceMsg()
   if eek.showingMessage then
     -- Check if we're at the last message in the instances queue (+1 because "\n" indicated end of instance)
@@ -219,6 +291,14 @@ function eek.advanceMsg()
   end
 end
 
+-------------------------------------------------
+-- Draw eek messagebox
+--
+-- @usage
+-- function love.draw()
+--   eek.draw()
+-- end
+-------------------------------------------------
 function eek.draw()
   -- This section is mostly unfinished...
   -- Lots of magic numbers and generally takes a lot of
@@ -312,14 +392,36 @@ function eek.draw()
 
   -- Reset fonts, run debugger if allowed
   love.graphics.setFont(defaultFont)
-  eek.drawDebug()
+  if eek.debug then
+    eek.drawDebug()
+  end
 end
 
+-------------------------------------------------
+-- Pass keys to eek when pressed
+-- @param key Keypress to be handed
+--
+-- @see keyreleased
+-- @usage
+-- function love.keypressed(key)
+--   eek.keypressed(key)
+-- end
+-------------------------------------------------
 function eek.keypressed(key)
   -- Lazily handle the keypress
   eek.keyreleased(key)
 end
 
+-------------------------------------------------
+-- Pass keys to eek when key released
+-- @param key Keyreleased to be handled
+--
+-- @see keypressed
+-- @usage
+-- function love.keyreleased(key)
+--   eek.keyreleased(key)
+-- end
+-------------------------------------------------
 function eek.keyreleased(key)
   if eek.showingOptions then
     if key == eek.selectButton and not typing then
@@ -372,6 +474,13 @@ function eek.keyreleased(key)
   end
 end
 
+-------------------------------------------------
+-- Change the typing speed of eek
+-- @string speed Type speed presets ("fast", "medium", "slow") __or__ some integer
+-- @usage
+-- eek.setSpeed("slow")
+-- eek.setSpeed(0.10)
+-------------------------------------------------
 function eek.setSpeed(speed)
   if speed == "fast" then
     eek.typeSpeed = 0.01
@@ -387,6 +496,15 @@ function eek.setSpeed(speed)
   typeTimerMax = eek.typeSpeed
 end
 
+-------------------------------------------------
+-- Define a HUMP camera for eek to use
+--
+-- @param camToUse HUMP camera
+-- @usage
+-- Camera = require("HUMP.camera")
+-- HUMPcam = Camera(10, 10)
+-- eek.setCamera(HUMPcam)
+-------------------------------------------------
 function eek.setCamera(camToUse)
   eek.currentCamera = camToUse
 end
@@ -412,6 +530,9 @@ function eek.playSound(sound)
   end
 end
 
+-------------------------------------------------
+-- Clear the current message container and close the message box
+-------------------------------------------------
 function eek.clearMessages()
   eek.showingMessage = false -- Prevents crashing
   eek.currentMsgKey = 1
@@ -419,32 +540,41 @@ function eek.clearMessages()
   eek.allMsgs = {}
 end
 
+-------------------------------------------------
+-- Define an alternate message container (default: `eek.allMsgs`)
+--
+-- @param table table Alternate messages container
+-- @usage
+-- aContainer = {}
+-- eek.defMsgContainer(aContainer)
+-------------------------------------------------
 function eek.defMsgContainer(table)
   eek.allMsgs = table
 end
 
+-------------------------------------------------
+-- Display some debug information
+---------------------------------------------------
 function eek.drawDebug()
-  if eek.debug == true then
-    log = { -- It works...
-      "typing", typing,
-      "paused", eek.paused,
-      "showOptions", eek.showingOptions,
-      "indicatorTimer", indicatorTimer,
-      "showIndicator", eek.showIndicator,
-      "printedText", printedText,
-      "textToPrint", eek.currentMessage,
-      "currentMsgInstance", eek.currentMsgInstance,
-      "currentMsgKey", eek.currentMsgKey,
-      "currentOption", eek.currentOption,
-      "currentHeader", utf8.sub(eek.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
-      "typeSpeed", eek.typeSpeed,
-      "typeSound", type(eek.typeSound) .. " " .. tostring(eek.typeSound),
-      "eek.allMsgs.len", #eek.allMsgs,
-      --"titleColor", unpack(eek.allMsgs[eek.currentMsgInstance].titleColor)
-    }
-    for i=1, #log, 2 do
-      love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
-    end
+  log = { -- It works...
+    "typing", typing,
+    "paused", eek.paused,
+    "showOptions", eek.showingOptions,
+    "indicatorTimer", indicatorTimer,
+    "showIndicator", eek.showIndicator,
+    "printedText", printedText,
+    "textToPrint", eek.currentMessage,
+    "currentMsgInstance", eek.currentMsgInstance,
+    "currentMsgKey", eek.currentMsgKey,
+    "currentOption", eek.currentOption,
+    "currentHeader", utf8.sub(eek.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
+    "typeSpeed", eek.typeSpeed,
+    "typeSound", type(eek.typeSound) .. " " .. tostring(eek.typeSound),
+    "eek.allMsgs.len", #eek.allMsgs,
+    --"titleColor", unpack(eek.allMsgs[eek.currentMsgInstance].titleColor)
+  }
+  for i=1, #log, 2 do
+    love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
   end
 end
 
@@ -552,3 +682,21 @@ function eek.wordwrap(str, limit)
 end
 
 return eek
+
+-------------------------------------------------
+-- config
+-- @table config
+--
+-------------------------------------------------
+
+-------------------------------------------------
+-- messages
+-- @table messages
+--
+-------------------------------------------------
+
+-------------------------------------------------
+-- options
+-- @table options
+--
+-------------------------------------------------
