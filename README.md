@@ -51,4 +51,5 @@ function love.keyreleased(key)
 end
 ```
 Further documentation can be found at http://twentytwoo.github.io/eek.lua/
+
 Old documentation can be found at https://github.com/twentytwoo/eek.lua/blob/5ecbd7eb81cdfe181f772242c5fda2292e363933/README.md
