@@ -1,11 +1,11 @@
-# Möan.lua
+# eek.lua
 A simple messagebox system for LÖVE.
 
 ```lua
-Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
+eek.speak("Title", {"Hello world!", "It's me;--eek.lua!"})
 ```
 
-![Preview of Moan.lua](preview.gif)
+![Preview of eek.lua](preview.gif)
 
 ## Features
 - Multiple choices prompt
@@ -23,19 +23,19 @@ Moan.new("Title", {"Hello world!", "It's me;--Möan.lua!"})
 - Possibly go towards a more OO approach
 
 ## How to
-* Download the `Moan/` folder in this repo
-* Include it via adding, `require('Moan/Moan')`, to the top of your `main.lua`
+* Download the `eek.lua` file in this repo
+* Include it via adding, `eek = require('eek')`, to the top of your `main.lua`
 * Add the following to your main.lua
 
 ```lua
-require('Moan')
+eek = require('eek')
 
 function love.load()
-  Moan.new("Title", {"Hello World!"})
+  eek.speak("Title", {"Hello World!"})
 end
 
 function love.update(dt)
-    Moan.update(dt)
+    eek.update(dt)
 end
 
 function love.draw()
@@ -43,19 +43,19 @@ function love.draw()
 
     -- We want the messagebox to be ontop of all other elements, so we draw it last
     -- Alternatively use a z-orderer (https://love2d.org/wiki/Tutorial:Drawing_Order)
-    Moan.draw()
+    eek.draw()
 end
 
 function love.keyreleased(key)
-    Moan.keyreleased(key) -- or Moan.keypressed(key)
+    eek.keyreleased(key) -- or eek.keypressed(key)
 end
 ```
 
 ## Syntax
 
-### Moan.new
+### eek.speak
 ```lua
-Moan.new(title, messages, config)
+eek.speak(title, messages, config)
 ```
 - **title**, string or table
   * if table then title[1] = string, messagebox title
@@ -63,7 +63,7 @@ Moan.new(title, messages, config)
 - **messages**, table, contains strings
 - **config**, table, contains message configs, takes;
   * `x`, camera x position (int) -- Only passed if using camera
-  * `y`, camera y position (int) -- See Moan.setCamera()
+  * `y`, camera y position (int) -- See eek.setCamera()
   * `image`, message icon image e.g. `love.graphics.newImage("img.png")`
   * `onstart`, function to be executed on message start
   * `oncomplete`, function executed on message end
@@ -74,8 +74,8 @@ Moan.new(title, messages, config)
 A full example:
 ```lua
 avatar = love.graphics.newImage("image.png")
-Moan.new({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
-                  onstart=function() camera:move(100, 20) end, oncomplete=function() Moan.setSpeed("slow") end,
+eek.speak({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
+                  onstart=function() camera:move(100, 20) end, oncomplete=function() eek.setSpeed("slow") end,
                   options={
                    {"Option one",  function() option1() end},
                    {"Option two",  function() option2() end},
@@ -90,18 +90,18 @@ There can be "infinite" options, however the options will probably overflow depe
 #### Pauses
 
 ```lua
-Moan.new("Title", {"Hello--World--This--Is--a lot--of pauses."})
+eek.speak("Title", {"Hello--World--This--Is--a lot--of pauses."})
 ```
 
-A double dash, `--`, causes Moan.lua to stop typing, and will only continue when `Moan.selectButton` is pressed, each `--` will be replaced with space.
+A double dash, `--`, causes eek.lua to stop typing, and will only continue when `eek.selectButton` is pressed, each `--` will be replaced with space.
 
-### Moan.setCamera()
-Sets the HUMP camera for Moan to use.
+### eek.setCamera()
+Sets the HUMP camera for eek to use.
 
 Depends on [flux.lua](https://github.com/rxi/flux) and [HUMP camera](https://github.com/vrld/hump).
 
 ```lua
-Moan.setCamera(HUMPcameraToUse)
+eek.setCamera(HUMPcameraToUse)
 ```
 
 Example;
@@ -111,15 +111,15 @@ flux = require("libs/flux")
 
 function love.load()
   camera = Camera(0,0)
-  Moan.setCamera(camera)
+  eek.setCamera(camera)
 
-  Moan.new("", {"Look here..."}, {x=10, y=50})
-  Moan.new("", {"And there there...". {x=70, y=0})
+  eek.speak("", {"Look here..."}, {x=10, y=50})
+  eek.speak("", {"And there there...". {x=70, y=0})
 end
 
 function love.update(dt)
   flux.update(dt)
-  Moan.update(dt)
+  eek.update(dt)
 end
 
 function love.draw()
@@ -127,16 +127,16 @@ function love.draw()
     draw_world()
   camera:detach()
 
-  Moan.draw()
+  eek.draw()
 end
 ```
 
-### Moan.setSpeed()
+### eek.setSpeed()
 
 Controls the speed at which letters are typed
 
 ```lua
-Moan.setSpeed(speed)
+eek.setSpeed(speed)
 ```
 
 - `"fast"`
@@ -144,59 +144,59 @@ Moan.setSpeed(speed)
 - `"slow"`
 - Or some number, default is `0.01`
 
-### Moan.clearMessages()
+### eek.clearMessages()
 
 ```lua
-Moan.clearMessages()
+eek.clearMessages()
 ```
 
 Removes all messages from the queue and closes the messagebox.
 
 
-### Moan.keyreleased / Moan.keypressed
+### eek.keyreleased / eek.keypressed
 
 ```lua
 function love.keypressed(key)
-  Moan.keypressed(key)
+  eek.keypressed(key)
 end
 
 function love.released(key)
-  Moan.keyreleased(key)
+  eek.keyreleased(key)
 end
 ```
 
-Pass keys to Moan to cycle through messages
+Pass keys to eek to cycle through messages
 
-### Moan.defMsgContainer()
+### eek.defMsgContainer()
 
 ```lua
 aMessageContainer = {}
-Moan.defMsgContainer(aMessageContainer)
+eek.defMsgContainer(aMessageContainer)
 
-Moan.new("Test", "Testing defMsgContainer")
+eek.speak("Test", "Testing defMsgContainer")
 print(aMessageContainer[1].title) -- => "Test"
 ```
 
-Define an alternative table to store your messages for whatever reason... As opposed to default `Moan.allMsgs` table.
+Define an alternative table to store your messages for whatever reason... As opposed to default `eek.allMsgs` table.
 
 ## Configuration
 
 ### Controls
-* `Moan.autoWrap` - Pre-wrap sentences by adding `\n`'s into sentences (bool)
-* `Moan.typeSound` - Typing sound, should be a very short clip
-  - e.g. `Moan.typeSound = love.audio.newSource("typeSound.wav", "static")`
-* `Moan.optionSound` - Sound to be played when a option is selected
-* `Moan.selectButton` - Button that cycles messagess, skips typing and chooses an option (string), default: `"return"`
-* `Moan.indicatorCharacter` - Character before option to indicate selection (string), default: ">"
-* `Moan.typeSpeed` - Speed at which a character is inputted (int), default: `0.02`
-* `Moan.currentImage` - Image currently displayed in the messagebox
-* `Moan.currentMessage` - Full current message (string)
+* `eek.autoWrap` - Pre-wrap sentences by adding `\n`'s into sentences (bool)
+* `eek.typeSound` - Typing sound, should be a very short clip
+  - e.g. `eek.typeSound = love.audio.newSource("typeSound.wav", "static")`
+* `eek.optionSound` - Sound to be played when a option is selected
+* `eek.selectButton` - Button that cycles messagess, skips typing and chooses an option (string), default: `"return"`
+* `eek.indicatorCharacter` - Character before option to indicate selection (string), default: ">"
+* `eek.typeSpeed` - Speed at which a character is inputted (int), default: `0.02`
+* `eek.currentImage` - Image currently displayed in the messagebox
+* `eek.currentMessage` - Full current message (string)
 
 ### UI
-* `Moan.font` - Messagebox font
-  - e.g. `Moan.font = love.graphics.newFont("Moan/main.ttf", 32)`
+* `eek.font` - Messagebox font
+  - e.g. `eek.font = love.graphics.newFont("eek/main.ttf", 32)`
 
-Currently these values are local to Moan.draw() so you'll have to edit the Moan.lua source
+Currently these values are local to eek.draw() so you'll have to edit the eek.lua source
 * `padding` - Image, text padding
 * `boxH` - Height of messagebox
 * `boxW` - Width of messagebox
@@ -214,6 +214,6 @@ Currently these values are local to Moan.draw() so you'll have to edit the Moan.
 * `boxColor` - RGBA messagebox background colour
 
 ### Other
-* `Moan.currentMsgInstance` - Current `Moan.new` (int)
-* `Moan.currentMsgKey` - Current key in the `currentMsgInstance` (int)
-* `Moan.currentOption` - Currently selected option (int)
+* `eek.currentMsgInstance` - Current `eek.speak` (int)
+* `eek.currentMsgKey` - Current key in the `currentMsgInstance` (int)
+* `eek.currentOption` - Currently selected option (int)
