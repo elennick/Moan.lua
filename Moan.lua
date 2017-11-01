@@ -1,12 +1,12 @@
 -------------------------------------------------
--- eek.lua (formerly Möan.lua)
+-- Möan.lua
 -- A simple messagebox system for LÖVE <br><br> Forum link: 
 -- [https://love2d.org/forums/viewtopic.php?f=5&t=84110](https://love2d.org/forums/viewtopic.php?f=5&t=84110)
--- <br>GitHub: [https://github.com/twentytwoo/eek.lua](https://github.com/twentytwoo/eek.lua)
+-- <br>GitHub: [https://github.com/twentytwoo/Moan.lua](https://github.com/twentytwoo/Moan.lua)
 -- <br><br><img src="../preview.gif" style="max-width: 100%">
--- @usage eek.speak("eek", {"W-Wh--What are you doing here?!", "Stay away from me!"})
+-- @usage Moan.speak("Moan", {"W-Wh--What are you doing here?!", "Stay away from me!"})
 --
--- @module eek
+-- @module Möan
 -- @author May W.
 -- @license MIT
 -- @copyright twentytwoo, 2017
@@ -23,32 +23,33 @@ local utf8 = require("utf8")
 -------------------------------------------------
 -- Main configuration table
 --
--- @table eek
+-- @table Moan
 -- @string indicatorCharacter Next message indicator, (default `">"`)
 -- @string optionCharacter Option selection prefix, (default `"- "`)
 -- @int indicatorDelay Time between next message indicator being toggled, (default `25`)
 -- @string selectButton Key that advanced to next message, (default `"space"`)
 -- @int typeSpeed Delay between character being printed via the typewriter
 -- @bool debug Display debug information
--- @tparam table allMsgs Contains messages (if not overriden by eek.defMsgContainer())
+-- @tparam table allMsgs Contains messages (if not overriden by Moan.defMsgContainer())
 -- @tparam table history Contains all messages that have been called
 -- @string currentMessage Current full message
--- @int currentMsgInstance Current eek.speak() instance+
+-- @int currentMsgInstance Current Moan.speak() instance+
 -- @int currentMsgKey Current key of current instances messages table
 -- @int currentOption Current key of selected option table
 -- @param userdata currentImage Current messagebox Love image object
--- @string _VERSION eek version
--- @string _URL eek repo url
+-- @string _VERSION Moan version
+-- @string _URL Moan repo url
 -- @string _DESCRIPTION Short description of the library
 -- @tparam table UI UI configuration
 -------------------------------------------------
-eek = {
+Moan = {
   indicatorCharacter = ">",
-  optionCharacter = "- ",
+  optionCharacter = "=> ",
   indicatorDelay = 25,
   selectButton = "space",
   typeSpeed = 0.01,
   debug = false,
+  mute = false,
   allMsgs = {},
 
   history = {},
@@ -59,25 +60,29 @@ eek = {
   currentImage = nil,
 
   _VERSION     = '0.2.9',
-  _URL         = 'https://github.com/twentytwoo/eek.lua',
+  _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple messagebox system for LÖVE',
 
-  UI = {}
+  UI = {
+    titleBoxPos = "left",
+    messageboxPos = "bottom",
+    imagePos = "left"
+  }
 }
 
 -- Section of the text printed so far
 local printedText  = ""
 -- Timer to know when to print a new letter
-local typeTimer    = eek.typeSpeed
-local typeTimerMax = eek.typeSpeed
+local typeTimer    = Moan.typeSpeed
+local typeTimerMax = Moan.typeSpeed
 -- Current position in the text
 local typePosition = 0
 -- Initialise timer for the indicator
 local indicatorTimer = 0
 local defaultFont = love.graphics.newFont()
 
-if eek.font == nil then
-  eek.font = defaultFont
+if Moan.font == nil then
+  Moan.font = defaultFont
 end
 
 -------------------------------------------------
@@ -92,13 +97,10 @@ end
 -- @tparam table messages
 -- @tparam table config
 --
--- @see config
--- @see options
--- @see messages
 -- @usage
 -- avatar = love.graphics.newImage("image.png")
--- eek.speak({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
---                   onstart=function() camera:move(100, 20) end, oncomplete=function() eek.setSpeed("slow") end,
+-- Moan.speak({"Mike", {0,255,0}}, {"Message one", "two--and", "Here's those options!"}, {x=10, y=10, image=avatar,
+--                   onstart=function() camera:move(100, 20) end, oncomplete=function() Moan.setSpeed("slow") end,
 --                   options={
 --                    {"Option one",  function() option1() end},
 --                    {"Option two",  function() option2() end},
@@ -106,7 +108,7 @@ end
 --                    {"Option n...", function() optionn() end}}
 --                   })
 -------------------------------------------------
-function eek.speak(title, messages, config)
+function Moan.speak(title, messages, config)
   if type(title) == "table" then
     titleColor = title[2]
     title = title[1]
@@ -123,19 +125,19 @@ function eek.speak(title, messages, config)
   local onstart = config.onstart or function() end
   local oncomplete = config.oncomplete or function() end
   if image == nil or type(image) ~= "userdata" then
-    -- image = eek.noImage
+    -- image = Moan.noImage
   end
 
   -- Insert \n before text is printed, stops half-words being printed
   -- and then wrapped onto new line
-  if eek.autoWrap then
+  if Moan.autoWrap then
     for i=1, #messages do
-      messages[i] = eek.wordwrap(messages[i], 65)
+      messages[i] = Moan.wordwrap(messages[i], 60)
     end
   end
 
-  -- Insert the eek.speak into its own instance (table)
-  eek.allMsgs[#eek.allMsgs+1] = {
+  -- Insert the Moan.speak into its own instance (table)
+  Moan.allMsgs[#Moan.allMsgs+1] = {
     title=title,
     titleColor=titleColor,
     messages=messages,
@@ -146,94 +148,94 @@ function eek.speak(title, messages, config)
     onstart=onstart,
     oncomplete=oncomplete
   }
-  eek.history[#eek.history+1] = {title, messages}
+  Moan.history[#Moan.history+1] = {title, messages}
 
   -- Set the last message as "\n", an indicator to change currentMsgInstance
-  eek.allMsgs[#eek.allMsgs].messages[#messages+1] = "\n"
-  eek.showingMessage = true
+  Moan.allMsgs[#Moan.allMsgs].messages[#messages+1] = "\n"
+  Moan.showingMessage = true
 
-  -- Only run .onstart()/setup if first message instance on first eek.speak
-  -- Prevents onstart=eek.speak(... recursion crashing the game.
-  if eek.currentMsgInstance == 1 then
+  -- Only run .onstart()/setup if first message instance on first Moan.speak
+  -- Prevents onstart=Moan.speak(... recursion crashing the game.
+  if Moan.currentMsgInstance == 1 then
     -- Set the first message up, after this is set up via advanceMsg()
     typePosition = 0
-    eek.currentMessage = eek.allMsgs[eek.currentMsgInstance].messages[eek.currentMsgKey]
-    eek.currentTitle = eek.allMsgs[eek.currentMsgInstance].title
-    eek.currentImage = eek.allMsgs[eek.currentMsgInstance].image
-    eek.showingOptions = false
+    Moan.currentMessage = Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey]
+    Moan.currentTitle = Moan.allMsgs[Moan.currentMsgInstance].title
+    Moan.currentImage = Moan.allMsgs[Moan.currentMsgInstance].image
+    Moan.showingOptions = false
     -- Run the first startup function
-    eek.allMsgs[eek.currentMsgInstance].onstart()
+    Moan.allMsgs[Moan.currentMsgInstance].onstart()
   end
 end
 
 -------------------------------------------------
--- eek Message updater
+-- Moan Message updater
 -- @int dt love delta-time
 --
 -- @usage
 -- function love.update(dt)
---   eek.update(dt)
+--   Moan.update(dt)
 -- end
 -------------------------------------------------
-function eek.update(dt)
+function Moan.update(dt)
   -- Check if the output string is equal to final string, else we must be still typing it
-  if printedText == eek.currentMessage then
+  if printedText == Moan.currentMessage then
     typing = false else typing = true
   end
 
-  if eek.showingMessage then
+  if Moan.showingMessage then
     -- Tiny timer for the message indicator
-    if (eek.paused or not typing) then
+    if (Moan.paused or not typing) then
       indicatorTimer = indicatorTimer + 1
-      if indicatorTimer > eek.indicatorDelay then
-        eek.showIndicator = not eek.showIndicator
+      if indicatorTimer > Moan.indicatorDelay then
+        Moan.showIndicator = not Moan.showIndicator
         indicatorTimer = 0
       end
     else
-      eek.showIndicator = false
+      Moan.showIndicator = false
     end
 
     -- Check if we're the 2nd to last message, verify if an options table exists, on next advance show options
-    if eek.allMsgs[eek.currentMsgInstance].messages[eek.currentMsgKey+1] == "\n" and type(eek.allMsgs[eek.currentMsgInstance].options) == "table" then
-      eek.showingOptions = true
+    if Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" and type(Moan.allMsgs[Moan.currentMsgInstance].options) == "table" then
+      Moan.showingOptions = true
     end
-    if eek.showingOptions then
+    if Moan.showingOptions then
       -- Constantly update the option prefix
-      for i=1, #eek.allMsgs[eek.currentMsgInstance].options do
+      for i=1, #Moan.allMsgs[Moan.currentMsgInstance].options do
         -- Remove the indicators from other selections
-        eek.allMsgs[eek.currentMsgInstance].options[i][1] = string.gsub(eek.allMsgs[eek.currentMsgInstance].options[i][1], eek.optionCharacter.." " , "")
+        Moan.allMsgs[Moan.currentMsgInstance].options[i][1] = string.gsub(Moan.allMsgs[Moan.currentMsgInstance].options[i][1], Moan.optionCharacter.." " , "")
       end
       -- Add an indicator to the current selection
-      if eek.allMsgs[eek.currentMsgInstance].options[eek.currentOption][1] ~= "" then
-        eek.allMsgs[eek.currentMsgInstance].options[eek.currentOption][1] = eek.optionCharacter.." ".. eek.allMsgs[eek.currentMsgInstance].options[eek.currentOption][1]
+      if Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1] ~= "" then
+        Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1] = Moan.optionCharacter.." ".. Moan.allMsgs[Moan.currentMsgInstance].options[Moan.currentOption][1]
       end
     end
 
     -- Detect a 'pause' by checking the content of the last two characters in the printedText
-    if string.sub(eek.currentMessage, string.len(printedText)+1, string.len(printedText)+2) == "--" then
-      eek.paused = true
-      else eek.paused = false
+    if string.sub(Moan.currentMessage, string.len(printedText)+1, string.len(printedText)+2) == "--" then
+      Moan.paused = true
+      else Moan.paused = false
     end
 
     --https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
-    if typePosition <= string.len(eek.currentMessage) then
+    if typePosition <= string.len(Moan.currentMessage) then
       -- Only decrease the timer when not paused
-      if not eek.paused then
+      if not Moan.paused then
         typeTimer = typeTimer - dt
       end
       -- Timer done, we need to print a new letter:
       -- Adjust position, use string.sub to get sub-string
       if typeTimer <= 0 then
         -- Only make the keypress sound if the next character is a letter
-        if string.sub(eek.currentMessage, typePosition, typePosition) ~= " " and typing then
-          eek.playSound(eek.typeSound)
+        if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
+          Moan.playSound(Moan.typeSound)
         end
         typeTimer = typeTimerMax
         typePosition = typePosition + 1
-          -- UTF8 support, thanks @FluffySifilis
-        local byteoffset = utf8.offset(eek.currentMessage, typePosition)
+        -- UTF8 support, thanks @FluffySifilis
+        local byteoffset = utf8.offset(Moan.currentMessage, typePosition)
         if byteoffset then
-          printedText = string.sub(eek.currentMessage, 0, byteoffset - 1)
+          printedText = string.sub(Moan.currentMessage, 0, byteoffset - 1)
         end
       end
     end
@@ -241,71 +243,71 @@ function eek.update(dt)
 end
 
 -------------------------------------------------
--- Force eek to progress onto the next message in the message queue
+-- Force Moan to progress onto the next message in the message queue
 -- @usage
--- if love.keyboard.isDown("space") then eek.advanceMsg() end
+-- if love.keyboard.isDown("space") then Moan.advanceMsg() end
 -------------------------------------------------
-function eek.advanceMsg()
-  if eek.showingMessage then
+function Moan.advanceMsg()
+  if Moan.showingMessage then
     -- Check if we're at the last message in the instances queue (+1 because "\n" indicated end of instance)
-    if eek.allMsgs[eek.currentMsgInstance].messages[eek.currentMsgKey+1] == "\n" then
+    if Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey+1] == "\n" then
       -- Last message in instance, so run the final function.
-      eek.allMsgs[eek.currentMsgInstance].oncomplete()
+      Moan.allMsgs[Moan.currentMsgInstance].oncomplete()
 
-      -- Check if we're the last instance in eek.allMsgs
-      if eek.allMsgs[eek.currentMsgInstance+1] == nil then
-        eek.currentMsgInstance = 1
-        eek.currentMsgKey = 1
-        eek.currentOption = 1
+      -- Check if we're the last instance in Moan.allMsgs
+      if Moan.allMsgs[Moan.currentMsgInstance+1] == nil then
+        Moan.currentMsgInstance = 1
+        Moan.currentMsgKey = 1
+        Moan.currentOption = 1
         typing = false
-        eek.showingMessage = false
+        Moan.showingMessage = false
         typePosition = 0
-        eek.showingOptions = false
-        eek.allMsgs = {}
+        Moan.showingOptions = false
+        Moan.allMsgs = {}
       else
         -- We're not the last instance, so we can go to the next one
         -- Reset the msgKey such that we read the first msg of the new instance
-        eek.currentMsgInstance = eek.currentMsgInstance + 1
-        eek.currentMsgKey = 1
-        eek.currentOption = 1
+        Moan.currentMsgInstance = Moan.currentMsgInstance + 1
+        Moan.currentMsgKey = 1
+        Moan.currentOption = 1
         typePosition = 0
-        eek.showingOptions = false
-        eek.moveCamera()
+        Moan.showingOptions = false
+        Moan.moveCamera()
       end
     else
       -- We're not the last message and we can show the next one
       -- Reset type position to restart typing
       typePosition = 0
-      eek.currentMsgKey = eek.currentMsgKey + 1
+      Moan.currentMsgKey = Moan.currentMsgKey + 1
     end
   end
 
-  -- Check showingMessage - throws an error if next instance is nil
-  if eek.showingMessage then
-    if eek.currentMsgKey == 1 then
-      eek.allMsgs[eek.currentMsgInstance].onstart()
+  -- Check showingMessage again - throws an error if next instance is nil otherwise
+  if Moan.showingMessage then
+    if Moan.currentMsgKey == 1 then
+      Moan.allMsgs[Moan.currentMsgInstance].onstart()
     end
-    eek.currentMessage = eek.allMsgs[eek.currentMsgInstance].messages[eek.currentMsgKey] or ""
-    eek.currentTitle = eek.allMsgs[eek.currentMsgInstance].title or ""
-    eek.currentImage = eek.allMsgs[eek.currentMsgInstance].image
+    Moan.currentMessage = Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey] or ""
+    Moan.currentTitle = Moan.allMsgs[Moan.currentMsgInstance].title or ""
+    Moan.currentImage = Moan.allMsgs[Moan.currentMsgInstance].image
   end
 end
 
 -------------------------------------------------
--- Draw eek messagebox
+-- Draw Moan messagebox
 --
 -- @usage
 -- function love.draw()
---   eek.draw()
+--   Moan.draw()
 -- end
 -------------------------------------------------
-function eek.draw()
+function Moan.draw()
   -- This section is mostly unfinished...
   -- Lots of magic numbers and generally takes a lot of
   -- trial and error to look right, beware.
 
   love.graphics.setDefaultFilter( "nearest", "nearest")
-  if eek.showingMessage then
+  if Moan.showingMessage then
     local scale = 0.26
     local padding = 10
 
@@ -313,48 +315,58 @@ function eek.draw()
     local boxW = love.graphics.getWidth()-(2*padding)
     local boxX = padding
     local boxY = love.graphics.getHeight()-(boxH+padding)
+    if Moan.UI.messageboxPos == "top" then boxY = 10 end
 
-    local fontHeight = eek.font:getHeight(" ")
+    local fontHeight = Moan.font:getHeight(" ")
 
     local imgX = (boxX+padding)*(1/scale)
     local imgY = (boxY+padding)*(1/scale)
-
-    if type(eek.currentImage) == "userdata" then
-      imgW = eek.currentImage:getWidth()
-      imgH = eek.currentImage:getHeight()
+    if type(Moan.currentImage) == "userdata" then
+      imgW = Moan.currentImage:getWidth()
+      imgH = Moan.currentImage:getHeight()
     else
       imgW = -10/(scale)
       imgH = 0
     end
 
-    local titleBoxW = eek.font:getWidth(eek.currentTitle)+(2*padding)
+    if Moan.UI.imagePos == "right" then
+      imgX = ((boxX+boxW)*(1/scale))-(imgW+padding*(1/scale))
+    end
+
+    local titleBoxW = Moan.font:getWidth(Moan.currentTitle)+(2*padding)
     local titleBoxH = fontHeight+padding
     local titleBoxX = boxX
+    -- overrides
     local titleBoxY = boxY-titleBoxH-(padding/2)
+    if Moan.UI.messageboxPos == "top" then
+      titleBoxY = boxY+boxH+padding
+    end
+    if Moan.UI.titleBoxPos == "right" then titleBoxX = boxX+boxW-(titleBoxW) end
 
-    local titleColor = eek.allMsgs[eek.currentMsgInstance].titleColor
+    local titleColor = Moan.allMsgs[Moan.currentMsgInstance].titleColor
     local titleX = titleBoxX+padding
     local titleY = titleBoxY+2
 
     local textX = (imgX+imgW)/(1/scale)+padding
     local textY = boxY
-
-    local optionsY = textY+eek.font:getHeight(printedText)-(padding/1.6)
-    local optionsSpace = fontHeight/1.5
-
-    local msgTextY = textY+eek.font:getHeight()/1.2
+    local msgTextY = textY+Moan.font:getHeight()/1.2
     local msgLimit = boxW-(imgW/(1/scale))-(4*padding)
+    if Moan.UI.imagePos == "right" then textX = boxX+padding end
+
+    local optionsY = textY+Moan.font:getHeight(printedText)-(padding/1.6)
+    local optionsSpace = fontHeight/1.5
 
     local fontColour = { 255, 255, 255, 255 }
     local boxColour = { 0, 0, 0, 222 }
 
-    love.graphics.setFont(eek.font)
+
+    love.graphics.setFont(Moan.font)
 
     -- Message title
     love.graphics.setColor(boxColour)
     love.graphics.rectangle("fill", titleBoxX, titleBoxY, titleBoxW, titleBoxH)
     love.graphics.setColor(titleColor)
-    love.graphics.print(eek.currentTitle, titleX, titleY)
+    love.graphics.print(Moan.currentTitle, titleX, titleY)
 
     -- Main message box
     love.graphics.setColor(boxColour)
@@ -362,170 +374,172 @@ function eek.draw()
     love.graphics.setColor(fontColour)
 
     -- Message avatar
-    if type(eek.currentImage) == "userdata" then
+    if type(Moan.currentImage) == "userdata" then
       love.graphics.push()
         love.graphics.scale(scale, scale)
-        love.graphics.draw(eek.currentImage, imgX, imgY)
+        love.graphics.draw(Moan.currentImage, imgX, imgY)
       love.graphics.pop()
     end
 
     -- Message text
-    if eek.autoWrap then
+    if Moan.autoWrap then
       love.graphics.print(printedText, textX, textY)
     else
       love.graphics.printf(printedText, textX, textY, msgLimit)
     end
 
     -- Message options (when shown)
-    if eek.showingOptions and typing == false then
-      for k, option in pairs(eek.allMsgs[eek.currentMsgInstance].options) do
+    if Moan.showingOptions and typing == false then
+      for k, option in pairs(Moan.allMsgs[Moan.currentMsgInstance].options) do
         -- First option has no Y padding...
         love.graphics.print(option[1], textX+padding, optionsY+((k-1)*optionsSpace))
       end
     end
 
     -- Next message/continue indicator
-    if eek.showIndicator then
-      love.graphics.print(eek.indicatorCharacter, boxX+boxW-(2.5*padding), boxY+boxH-(padding/2)-fontHeight)
+    if Moan.showIndicator then
+      if not (Moan.UI.imagePos == "right" and type(Moan.currentImage) == "userdata") then
+        love.graphics.print(Moan.indicatorCharacter, boxX+boxW-(2.5*padding), boxY+boxH-(padding/2)-fontHeight)
+      end
     end
   end
 
   -- Reset fonts, run debugger if allowed
   love.graphics.setFont(defaultFont)
-  if eek.debug then
-    eek.drawDebug()
+  if Moan.debug then
+    Moan.drawDebug()
   end
 end
 
 -------------------------------------------------
--- Pass keys to eek when pressed
+-- Pass keys to Moan when pressed
 -- @param key Keypress to be handed
 --
 -- @see keyreleased
 -- @usage
 -- function love.keypressed(key)
---   eek.keypressed(key)
+--   Moan.keypressed(key)
 -- end
 -------------------------------------------------
-function eek.keypressed(key)
+function Moan.keypressed(key)
   -- Lazily handle the keypress
-  eek.keyreleased(key)
+  Moan.keyreleased(key)
 end
 
 -------------------------------------------------
--- Pass keys to eek when key released
+-- Pass keys to Moan when key released
 -- @param key Keyreleased to be handled
 --
 -- @see keypressed
 -- @usage
 -- function love.keyreleased(key)
---   eek.keyreleased(key)
+--   Moan.keyreleased(key)
 -- end
 -------------------------------------------------
-function eek.keyreleased(key)
-  if eek.showingOptions then
-    if key == eek.selectButton and not typing then
-      if eek.currentMsgKey == #eek.allMsgs[eek.currentMsgInstance].messages-1 then
-        -- Execute the selected function
-        for i=1, #eek.allMsgs[eek.currentMsgInstance].options do
-          if eek.currentOption == i then
-            eek.allMsgs[eek.currentMsgInstance].options[i][2]()
-            eek.playSound(eek.optionSwitchSound)
+function Moan.keyreleased(key)
+  if Moan.showingOptions then
+    if key == Moan.selectButton and not typing then
+      if Moan.currentMsgKey == #Moan.allMsgs[Moan.currentMsgInstance].messages-1 then
+        -- Execute the selected option function
+        for i=1, #Moan.allMsgs[Moan.currentMsgInstance].options do
+          if Moan.currentOption == i then
+            Moan.allMsgs[Moan.currentMsgInstance].options[i][2]()
+            Moan.playSound(Moan.optionSwitchSound)
           end
         end
       end
       -- Option selection
       elseif key == "down" or key == "s" then
-        eek.currentOption = eek.currentOption + 1
-        eek.playSound(eek.optionSwitchSound)
+        Moan.currentOption = Moan.currentOption + 1
+        Moan.playSound(Moan.optionSwitchSound)
       elseif key == "up" or key == "w" then
-        eek.currentOption = eek.currentOption - 1
-        eek.playSound(eek.optionSwitchSound)
+        Moan.currentOption = Moan.currentOption - 1
+        Moan.playSound(Moan.optionSwitchSound)
       end
       -- Return to top/bottom of options on overflow
-      if eek.currentOption < 1 then
-        eek.currentOption = #eek.allMsgs[eek.currentMsgInstance].options
-      elseif eek.currentOption > #eek.allMsgs[eek.currentMsgInstance].options then
-        eek.currentOption = 1
+      if Moan.currentOption < 1 then
+        Moan.currentOption = #Moan.allMsgs[Moan.currentMsgInstance].options
+      elseif Moan.currentOption > #Moan.allMsgs[Moan.currentMsgInstance].options then
+        Moan.currentOption = 1
     end
   end
   -- Check if we're still typing, if we are we can skip it
   -- If not, then go to next message/instance
-  if key == eek.selectButton then
-    if eek.paused then
+  if key == Moan.selectButton then
+    if Moan.paused then
       -- Get the text left and right of "--"
-      leftSide = string.sub(eek.currentMessage, 1, string.len(printedText))
-      rightSide = string.sub(eek.currentMessage, string.len(printedText)+3, string.len(eek.currentMessage))
+      leftSide = string.sub(Moan.currentMessage, 1, string.len(printedText))
+      rightSide = string.sub(Moan.currentMessage, string.len(printedText)+3, string.len(Moan.currentMessage))
       -- And then concatenate them, kudos to @pfirsich for the help :)
-      eek.currentMessage = leftSide .. " " .. rightSide
+      Moan.currentMessage = leftSide .. " " .. rightSide
       -- Put the typerwriter back a bit and start up again
       typePosition = typePosition - 1
       typeTimer = 0
     else
       if typing == true then
         -- Skip the typing completely, replace all -- with spaces since we're skipping the pauses
-        eek.currentMessage = string.gsub(eek.currentMessage, "%-%-", " ")
-        printedText = eek.currentMessage
-        typePosition = string.len(eek.currentMessage)
+        Moan.currentMessage = string.gsub(Moan.currentMessage, "%-%-", " ")
+        printedText = Moan.currentMessage
+        typePosition = string.len(Moan.currentMessage)
       else
-        eek.advanceMsg()
+        Moan.advanceMsg()
       end
     end
   end
 end
 
 -------------------------------------------------
--- Change the typing speed of eek
+-- Change the typing speed of Moan
 -- @string speed Type speed presets ("fast", "medium", "slow") __or__ some integer
 -- @usage
--- eek.setSpeed("slow")
--- eek.setSpeed(0.10)
+-- Moan.setSpeed("slow")
+-- Moan.setSpeed(0.10)
 -------------------------------------------------
-function eek.setSpeed(speed)
+function Moan.setSpeed(speed)
   if speed == "fast" then
-    eek.typeSpeed = 0.01
+    Moan.typeSpeed = 0.01
   elseif speed == "medium" then
-    eek.typeSpeed = 0.04
+    Moan.typeSpeed = 0.04
   elseif speed == "slow" then
-    eek.typeSpeed = 0.08
+    Moan.typeSpeed = 0.08
   else
-    assert(tonumber(speed), "eek.setSpeed() - Expected number, got " .. tostring(speed))
-    eek.typeSpeed = speed
+    assert(tonumber(speed), "Moan.setSpeed() - Expected number, got " .. tostring(speed))
+    Moan.typeSpeed = speed
   end
   -- Update the timeout timer.
-  typeTimerMax = eek.typeSpeed
+  typeTimerMax = Moan.typeSpeed
 end
 
 -------------------------------------------------
--- Define a HUMP camera for eek to use
+-- Define a HUMP camera for Moan to use
 --
 -- @param camToUse HUMP camera
 -- @usage
 -- Camera = require("HUMP.camera")
 -- HUMPcam = Camera(10, 10)
--- eek.setCamera(HUMPcam)
+-- Moan.setCamera(HUMPcam)
 -------------------------------------------------
-function eek.setCamera(camToUse)
-  eek.currentCamera = camToUse
+function Moan.setCamera(camToUse)
+  Moan.currentCamera = camToUse
 end
 
-function eek.moveCamera()
+function Moan.moveCamera()
   -- Only move the camera if one exists
-  if eek.currentCamera ~= nil then
+  if Moan.currentCamera ~= nil then
     -- Move the camera to the new instances position
-    if (eek.allMsgs[eek.currentMsgInstance].x and eek.allMsgs[eek.currentMsgInstance].y) ~= nil then
-      flux.to(eek.currentCamera, 1, { x = eek.allMsgs[eek.currentMsgInstance].x, y = eek.allMsgs[eek.currentMsgInstance].y }):ease("cubicout")
+    if (Moan.allMsgs[Moan.currentMsgInstance].x and Moan.allMsgs[Moan.currentMsgInstance].y) ~= nil then
+      flux.to(Moan.currentCamera, 1, { x = Moan.allMsgs[Moan.currentMsgInstance].x, y = Moan.allMsgs[Moan.currentMsgInstance].y }):ease("cubicout")
     end
   end
 end
 
-function eek.setTheme(style)
-  for _, setting in pairs(eek.UI) do
+function Moan.setTheme(style)
+  for _, setting in pairs(Moan.UI) do
   end
 end
 
-function eek.playSound(sound)
-  if type(sound) == "userdata" then
+function Moan.playSound(sound)
+  if type(sound) == "userdata" and not Moan.mute then
     sound:play()
   end
 end
@@ -533,45 +547,45 @@ end
 -------------------------------------------------
 -- Clear the current message container and close the message box
 -------------------------------------------------
-function eek.clearMessages()
-  eek.showingMessage = false -- Prevents crashing
-  eek.currentMsgKey = 1
-  eek.currentMsgInstance = 1
-  eek.allMsgs = {}
+function Moan.clearMessages()
+  Moan.showingMessage = false -- Prevents crashing
+  Moan.currentMsgKey = 1
+  Moan.currentMsgInstance = 1
+  Moan.allMsgs = {}
 end
 
 -------------------------------------------------
--- Define an alternate message container (default: `eek.allMsgs`)
+-- Define an alternate message container (default: `Moan.allMsgs`)
 --
 -- @param table table Alternate messages container
 -- @usage
 -- aContainer = {}
--- eek.defMsgContainer(aContainer)
+-- Moan.defMsgContainer(aContainer)
 -------------------------------------------------
-function eek.defMsgContainer(table)
-  eek.allMsgs = table
+function Moan.defMsgContainer(table)
+  Moan.allMsgs = table
 end
 
 -------------------------------------------------
 -- Display some debug information
 ---------------------------------------------------
-function eek.drawDebug()
+function Moan.drawDebug()
   log = { -- It works...
     "typing", typing,
-    "paused", eek.paused,
-    "showOptions", eek.showingOptions,
+    "paused", Moan.paused,
+    "showOptions", Moan.showingOptions,
     "indicatorTimer", indicatorTimer,
-    "showIndicator", eek.showIndicator,
+    "showIndicator", Moan.showIndicator,
     "printedText", printedText,
-    "textToPrint", eek.currentMessage,
-    "currentMsgInstance", eek.currentMsgInstance,
-    "currentMsgKey", eek.currentMsgKey,
-    "currentOption", eek.currentOption,
-    "currentHeader", utf8.sub(eek.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
-    "typeSpeed", eek.typeSpeed,
-    "typeSound", type(eek.typeSound) .. " " .. tostring(eek.typeSound),
-    "eek.allMsgs.len", #eek.allMsgs,
-    --"titleColor", unpack(eek.allMsgs[eek.currentMsgInstance].titleColor)
+    "textToPrint", Moan.currentMessage,
+    "currentMsgInstance", Moan.currentMsgInstance,
+    "currentMsgKey", Moan.currentMsgKey,
+    "currentOption", Moan.currentOption,
+    "currentHeader", utf8.sub(Moan.currentMessage, utf8.len(printedText)+1, utf8.len(printedText)+2),
+    "typeSpeed", Moan.typeSpeed,
+    "typeSound", type(Moan.typeSound) .. " " .. tostring(Moan.typeSound),
+    "Moan.allMsgs.len", #Moan.allMsgs,
+    --"titleColor", unpack(Moan.allMsgs[Moan.currentMsgInstance].titleColor)
   }
   for i=1, #log, 2 do
     love.graphics.print(tostring(log[i]) .. ":  " .. tostring(log[i+1]), 10, 7*i)
@@ -650,7 +664,7 @@ function utf8.sub (s, i, j)
 end
 
 -- ripped from https://github.com/rxi/lume
-function eek.wordwrap(str, limit)
+function Moan.wordwrap(str, limit)
   limit = limit or 72
   local check
   if type(limit) == "number" then
@@ -681,22 +695,4 @@ function eek.wordwrap(str, limit)
   return table.concat(rtn)
 end
 
-return eek
-
--------------------------------------------------
--- config
--- @table config
---
--------------------------------------------------
-
--------------------------------------------------
--- messages
--- @table messages
---
--------------------------------------------------
-
--------------------------------------------------
--- options
--- @table options
---
--------------------------------------------------
+return Moan
