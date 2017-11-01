@@ -36,25 +36,25 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><strong>eek</strong></li>
+  <li><strong>Moan</strong></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>eek</code></h1>
-<p>eek.lua (formerly Möan.lua)
+<h1>Module <code>Moan</code></h1>
+<p>Möan.lua
  A simple messagebox system for LÖVE <br><br> Forum link:
  <a href="https://love2d.org/forums/viewtopic.php?f=5&amp;t=84110">https://love2d.org/forums/viewtopic.php?f=5&amp;t=84110</a>
- <br>GitHub: <a href="https://github.com/twentytwoo/eek.lua">https://github.com/twentytwoo/eek.lua</a>
- <br><br><img src="../preview.gif" style="max-width: 100%"></p>
+ <br>GitHub: <a href="https://github.com/twentytwoo/Moan.lua">https://github.com/twentytwoo/Moan.lua</a>
+ <br><br><img src="https://github.com/twentytwoo/Moan.lua/raw/master/preview.gif" style="max-width: 100%"></p>
 <p>
 
 </p>
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">eek.speak(&quot;eek&quot;, {&quot;W-Wh--What are you doing here?!&quot;, &quot;Stay away from me!&quot;})
+        <pre class="example">Moan.speak(&quot;Moan&quot;, {&quot;W-Wh--What are you doing here?!&quot;, &quot;Stay away from me!&quot;})
 </pre>
     </ul>
     <h3>Info:</h3>
@@ -73,31 +73,31 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#update">update (dt)</a></td>
-	<td class="summary">eek Message updater</td>
+	<td class="summary">Moan Message updater</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#advanceMsg">advanceMsg ()</a></td>
-	<td class="summary">Force eek to progress onto the next message in the message queue</td>
+	<td class="summary">Force Moan to progress onto the next message in the message queue</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#draw">draw ()</a></td>
-	<td class="summary">Draw eek messagebox</td>
+	<td class="summary">Draw Moan messagebox</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#keypressed">keypressed (key)</a></td>
-	<td class="summary">Pass keys to eek when pressed</td>
+	<td class="summary">Pass keys to Moan when pressed</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#keyreleased">keyreleased (key)</a></td>
-	<td class="summary">Pass keys to eek when key released</td>
+	<td class="summary">Pass keys to Moan when key released</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#setSpeed">setSpeed (speed)</a></td>
-	<td class="summary">Change the typing speed of eek</td>
+	<td class="summary">Change the typing speed of Moan</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#setCamera">setCamera (camToUse)</a></td>
-	<td class="summary">Define a HUMP camera for eek to use</td>
+	<td class="summary">Define a HUMP camera for Moan to use</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#clearMessages">clearMessages ()</a></td>
@@ -105,7 +105,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#defMsgContainer">defMsgContainer (table)</a></td>
-	<td class="summary">Define an alternate message container (default: <code>eek.allMsgs</code>)</td>
+	<td class="summary">Define an alternate message container (default: <code>Moan.allMsgs</code>)</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#drawDebug">drawDebug ()</a></td>
@@ -115,20 +115,8 @@
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#eek">eek</a></td>
+	<td class="name" nowrap><a href="#Moan">Moan</a></td>
 	<td class="summary">Main configuration table</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#config">config</a></td>
-	<td class="summary">config</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#messages">messages</a></td>
-	<td class="summary">messages</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#options">options</a></td>
-	<td class="summary">options</td>
 	</tr>
 </table>
 
@@ -174,18 +162,12 @@
 
 
 
-    <h3>See also:</h3>
-    <ul>
-         <li><a href="index.html#config">config</a></li>
-         <li><a href="index.html#options">options</a></li>
-         <li><a href="index.html#messages">messages</a></li>
-    </ul>
 
     <h3>Usage:</h3>
     <ul>
         <pre class="example">avatar = love.graphics.newImage(<span class="string">"image.png"</span>)
-eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>}}, {<span class="string">"Message one"</span>, <span class="string">"two--and"</span>, <span class="string">"Here's those options!"</span>}, {x=<span class="number">10</span>, y=<span class="number">10</span>, image=avatar,
-                  onstart=<span class="keyword">function</span>() camera:move(<span class="number">100</span>, <span class="number">20</span>) <span class="keyword">end</span>, oncomplete=<span class="keyword">function</span>() eek.setSpeed(<span class="string">"slow"</span>) <span class="keyword">end</span>,
+Moan.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>}}, {<span class="string">"Message one"</span>, <span class="string">"two--and"</span>, <span class="string">"Here's those options!"</span>}, {x=<span class="number">10</span>, y=<span class="number">10</span>, image=avatar,
+                  onstart=<span class="keyword">function</span>() camera:move(<span class="number">100</span>, <span class="number">20</span>) <span class="keyword">end</span>, oncomplete=<span class="keyword">function</span>() Moan.setSpeed(<span class="string">"slow"</span>) <span class="keyword">end</span>,
                   options={
                    {<span class="string">"Option one"</span>,  <span class="keyword">function</span>() option1() <span class="keyword">end</span>},
                    {<span class="string">"Option two"</span>,  <span class="keyword">function</span>() option2() <span class="keyword">end</span>},
@@ -200,7 +182,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>update (dt)</strong>
     </dt>
     <dd>
-    eek Message updater
+    Moan Message updater
 
 
     <h3>Parameters:</h3>
@@ -217,7 +199,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">function</span> love.update(dt)
-  eek.update(dt)
+  Moan.update(dt)
 <span class="keyword">end</span></pre>
     </ul>
 
@@ -227,7 +209,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>advanceMsg ()</strong>
     </dt>
     <dd>
-    Force eek to progress onto the next message in the message queue
+    Force Moan to progress onto the next message in the message queue
 
 
 
@@ -236,7 +218,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">if</span> love.keyboard.isDown(<span class="string">"space"</span>) <span class="keyword">then</span> eek.advanceMsg() <span class="keyword">end</span></pre>
+        <pre class="example"><span class="keyword">if</span> love.keyboard.isDown(<span class="string">"space"</span>) <span class="keyword">then</span> Moan.advanceMsg() <span class="keyword">end</span></pre>
     </ul>
 
 </dd>
@@ -245,7 +227,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>draw ()</strong>
     </dt>
     <dd>
-    Draw eek messagebox
+    Draw Moan messagebox
 
 
 
@@ -255,7 +237,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">function</span> love.draw()
-  eek.draw()
+  Moan.draw()
 <span class="keyword">end</span></pre>
     </ul>
 
@@ -265,7 +247,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>keypressed (key)</strong>
     </dt>
     <dd>
-    Pass keys to eek when pressed
+    Pass keys to Moan when pressed
 
 
     <h3>Parameters:</h3>
@@ -285,7 +267,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">function</span> love.keypressed(key)
-  eek.keypressed(key)
+  Moan.keypressed(key)
 <span class="keyword">end</span></pre>
     </ul>
 
@@ -295,7 +277,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>keyreleased (key)</strong>
     </dt>
     <dd>
-    Pass keys to eek when key released
+    Pass keys to Moan when key released
 
 
     <h3>Parameters:</h3>
@@ -315,7 +297,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">function</span> love.keyreleased(key)
-  eek.keyreleased(key)
+  Moan.keyreleased(key)
 <span class="keyword">end</span></pre>
     </ul>
 
@@ -325,7 +307,7 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
     <strong>setSpeed (speed)</strong>
     </dt>
     <dd>
-    Change the typing speed of eek
+    Change the typing speed of Moan
 
 
     <h3>Parameters:</h3>
@@ -341,8 +323,8 @@ eek.speak({<span class="string">"Mike"</span>, {<span class="number">0</span>,<s
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">eek.setSpeed(<span class="string">"slow"</span>)
-eek.setSpeed(<span class="number">0.10</span>)</pre>
+        <pre class="example">Moan.setSpeed(<span class="string">"slow"</span>)
+Moan.setSpeed(<span class="number">0.10</span>)</pre>
     </ul>
 
 </dd>
@@ -351,7 +333,7 @@ eek.setSpeed(<span class="number">0.10</span>)</pre>
     <strong>setCamera (camToUse)</strong>
     </dt>
     <dd>
-    Define a HUMP camera for eek to use
+    Define a HUMP camera for Moan to use
 
 
     <h3>Parameters:</h3>
@@ -368,7 +350,7 @@ eek.setSpeed(<span class="number">0.10</span>)</pre>
     <ul>
         <pre class="example">Camera = <span class="global">require</span>(<span class="string">"HUMP.camera"</span>)
 HUMPcam = Camera(<span class="number">10</span>, <span class="number">10</span>)
-eek.setCamera(HUMPcam)</pre>
+Moan.setCamera(HUMPcam)</pre>
     </ul>
 
 </dd>
@@ -391,7 +373,7 @@ eek.setCamera(HUMPcam)</pre>
     <strong>defMsgContainer (table)</strong>
     </dt>
     <dd>
-    Define an alternate message container (default: <code>eek.allMsgs</code>)
+    Define an alternate message container (default: <code>Moan.allMsgs</code>)
 
 
     <h3>Parameters:</h3>
@@ -407,7 +389,7 @@ eek.setCamera(HUMPcam)</pre>
     <h3>Usage:</h3>
     <ul>
         <pre class="example">aContainer = {}
-eek.defMsgContainer(aContainer)</pre>
+Moan.defMsgContainer(aContainer)</pre>
     </ul>
 
 </dd>
@@ -430,8 +412,8 @@ eek.defMsgContainer(aContainer)</pre>
 
     <dl class="function">
     <dt>
-    <a name = "eek"></a>
-    <strong>eek</strong>
+    <a name = "Moan"></a>
+    <strong>Moan</strong>
     </dt>
     <dd>
     Main configuration table
@@ -465,7 +447,7 @@ eek.defMsgContainer(aContainer)</pre>
         </li>
         <li><span class="parameter">allMsgs</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
-         Contains messages (if not overriden by eek.defMsgContainer())
+         Contains messages (if not overriden by Moan.defMsgContainer())
         </li>
         <li><span class="parameter">history</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
@@ -477,7 +459,7 @@ eek.defMsgContainer(aContainer)</pre>
         </li>
         <li><span class="parameter">currentMsgInstance</span>
             <span class="types"><span class="type">int</span></span>
-         Current eek.speak() instance+
+         Current Moan.speak() instance+
         </li>
         <li><span class="parameter">currentMsgKey</span>
             <span class="types"><span class="type">int</span></span>
@@ -492,11 +474,11 @@ eek.defMsgContainer(aContainer)</pre>
         </li>
         <li><span class="parameter">_VERSION</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         eek version
+         Moan version
         </li>
         <li><span class="parameter">_URL</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         eek repo url
+         Moan repo url
         </li>
         <li><span class="parameter">_DESCRIPTION</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
@@ -513,48 +495,6 @@ eek.defMsgContainer(aContainer)</pre>
 
 
 </dd>
-    <dt>
-    <a name = "config"></a>
-    <strong>config</strong>
-    </dt>
-    <dd>
-    config
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "messages"></a>
-    <strong>messages</strong>
-    </dt>
-    <dd>
-    messages
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "options"></a>
-    <strong>options</strong>
-    </dt>
-    <dd>
-    options
-
-
-
-
-
-
-
-</dd>
 </dl>
 
 
@@ -562,7 +502,7 @@ eek.defMsgContainer(aContainer)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-10-31 06:47:23 </i>
+<i style="float:right;">Last updated 2017-11-01 05:05:41 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

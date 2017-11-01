@@ -3,10 +3,10 @@
 -- A simple messagebox system for LÖVE <br><br> Forum link: 
 -- [https://love2d.org/forums/viewtopic.php?f=5&t=84110](https://love2d.org/forums/viewtopic.php?f=5&t=84110)
 -- <br>GitHub: [https://github.com/twentytwoo/Moan.lua](https://github.com/twentytwoo/Moan.lua)
--- <br><br><img src="../preview.gif" style="max-width: 100%">
+-- <br><br><img src="https://github.com/twentytwoo/Moan.lua/raw/master/preview.gif" style="max-width: 100%">
 -- @usage Moan.speak("Moan", {"W-Wh--What are you doing here?!", "Stay away from me!"})
 --
--- @module Möan
+-- @module Moan
 -- @author May W.
 -- @license MIT
 -- @copyright twentytwoo, 2017
