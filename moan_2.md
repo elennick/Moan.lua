@@ -3,7 +3,7 @@ Messenger = Moan.newContainer()
 
 Messenger.createGroup("Player")
 with Messenger.groups["Player"]
-  \assignFunctions({
+  \assignAttributes({
     -> setImage("dir/Player.png")
     -> setSpeed(0.2)
   })
