@@ -1,5 +1,5 @@
 # Möan.lua
-A simple messagebox system for LÖVE.
+A simple messagebox system for LÖVE 0.10.x.
 
 ```lua
 Moan.speak("Title", {"Hello world!", "It's me;--Möan.lua!"})
