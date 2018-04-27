@@ -165,6 +165,7 @@ function Moan.speak(title, messages, config)
     Moan.showingOptions = false
     -- Run the first startup function
     Moan.allMsgs[Moan.currentMsgInstance].onstart()
+    Moan.moveCamera()
   end
 end
 
