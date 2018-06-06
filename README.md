@@ -5,7 +5,7 @@ A simple messagebox system for LÖVE 0.10.x.
 Moan.speak("Title", {"Hello world!", "It's me;--Möan.lua!"})
 ```
 
-Further documentation can be found at: http://twentytwoo.github.io/Moan.lua/
+Further documentation can be found at: http://ttxi.github.io/Moan.lua/
 
 ![Preview of Möan.lua](preview.gif)
 
