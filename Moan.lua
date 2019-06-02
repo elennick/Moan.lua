@@ -113,7 +113,7 @@ function Moan.speak(title, messages, config)
     titleColor = title[2]
     title = title[1]
   else -- just a string
-    titleColor = {255, 255, 255}
+    titleColor = {255/255, 255/255, 255/255}
   end
 
   -- Config checking / defaulting
@@ -357,8 +357,8 @@ function Moan.draw()
     local optionsY = textY+Moan.font:getHeight(printedText)-(padding/1.6)
     local optionsSpace = fontHeight/1.5
 
-    local fontColour = { 255, 255, 255, 255 }
-    local boxColour = { 0, 0, 0, 222 }
+    local fontColour = { 255/255, 255/255, 255/255, 255/255 }
+    local boxColour = { 0/255, 0/255, 0/255, 222/255 }
 
 
     love.graphics.setFont(Moan.font)

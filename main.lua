@@ -19,7 +19,7 @@ function love.load()
 	Moan.optionSwitchSound = love.audio.newSource("assets/optionSwitch.wav", "static")
   Moan.noImage = love.graphics.newImage("assets/noImage.png")
 
-	love.graphics.setBackgroundColor(100, 100, 100, 255)
+	love.graphics.setBackgroundColor(100/255, 100/255, 100/255, 255/255)
 	math.randomseed(os.time())
 
 	-- Make some objects
@@ -35,8 +35,8 @@ function love.load()
 	avatar = love.graphics.newImage("assets/Obey_Me.png")
 
 	-- Put some messages into the Moan queue
-	Moan.speak({"Möan.lua", {255,105,180}}, {"Hello World!"}, {image=avatar})
-	Moan.speak({"Tutorial", {0,191,255}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
+	Moan.speak({"Möan.lua", {255/255,105/255,180/255}}, {"Hello World!"}, {image=avatar})
+	Moan.speak({"Tutorial", {0/255,191/255,255/255}}, {"Möan.lua is a simple to use messagebox library, it includes;", "Multiple choices,--UTF8 text,--Pauses,--Optional camera control,--Onstart/Oncomplete functions,--Complete customization,--Variable typing speeds umongst other things."},
 			     {x=p2.x, y=p2.y, image=avatar, onstart=function() rand() Moan.UI.messageboxPos = "top" Moan.UI.imagePos = "right" end})
 	Moan.speak("Tutorial", {"Typing sound modulates with speed..."}, {onstart=function() Moan.setSpeed("slow") Moan.UI.messageboxPos = "bottom" end, oncomplete=function() Moan.setSpeed("fast") Moan.UI.titleBoxPos = "left" end})
   Moan.speak("Tutorial", {"Here's some options:"}, {
@@ -79,7 +79,7 @@ function love.keyreleased(key)
 	if key == "f" then
 		Moan.advanceMsg()
   elseif key == "t" then
-    Moan.UI.boxColour = {100,0,0}
+    Moan.UI.boxColour = {100/255,0/255,0/255}
 	elseif key == "`" then
 		Moan.debug = not Moan.debug
 	elseif key == "c" then
@@ -92,23 +92,23 @@ end
 -- DEMO FUNCTIONS ===========================================================================
 
 function rand()
-	love.graphics.setBackgroundColor(math.random(255), math.random(255), math.random(255))
+	love.graphics.setBackgroundColor(math.random(), math.random(), math.random())
 end
 
 function red()
-	love.graphics.setBackgroundColor(255,0,0)
+	love.graphics.setBackgroundColor(255/255,0/255,0/255)
 	Moan.speak("Hey!", {"You picked Red!"})
 	moreMessages()
 end
 
 function blue()
-	love.graphics.setBackgroundColor(0,0,255)
+	love.graphics.setBackgroundColor(0/255,0/255,255/255)
 	Moan.speak("Hey!", {"You picked Blue!"})
 	moreMessages()
 end
 
 function green()
-	love.graphics.setBackgroundColor(0,255,0)
+	love.graphics.setBackgroundColor(0/255,255/255,0/255)
 	Moan.speak("Hey!", {"You picked Green!"})
 	moreMessages()
 end
